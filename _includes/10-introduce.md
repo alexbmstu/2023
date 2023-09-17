@@ -71,7 +71,7 @@ img
 .image-caption {
   text-align: center;
   font-size: 1.0rem;
-  color: darkgrey;
+  color: black;
 }
 
 </style>

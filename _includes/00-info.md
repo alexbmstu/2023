@@ -5,7 +5,7 @@
 |: --------------------------------------- :|: --------------------------------------- :|: --------------------------------------- :|: --------------------------------------- :|
 |   [Алексей Попов](mailto:alexpopov@bmstu.ru), <br> *МГТУ им. Н.Э.Баумана*   |   [Станислав  Ибрагимов](mailto:ibragimov@bmstu.ru)  <br>  *МГТУ им. Н.Э.Баумана*    |   [Егор Дубровин](mailto:dubrovin.en@ya.ru)  <br>  *МГТУ им. Н.Э.Баумана*    |   [Ли Цзяцзянь](mailto:dreki.li@mail.ru)  <br>  *МГТУ им. Н.Э.Баумана*    |   
  
-|   <img src="assets/max_kalitvencev.png" class="smallPic"> |  <img src="" class="smallPic">  |  <img src="assets/egor_dubrovin.png" class="smallPic">  |  <img src="assets/petr_shumnov.png" class="smallPic">  |  
+|   <img src="assets/max_kalitvencev.png" class="smallPic"> |  <img src="assets/PXL_20220430_152105151.MP-modified.png" class="smallPic">  |  <img src="" class="smallPic">  |  <img src="assets/petr_shumnov.png" class="smallPic">  |  
 |: --------------------------------------- :|: --------------------------------------- :|: --------------------------------------- :|: --------------------------------------- :|
 |   [Максим Калитвенцев](mailto:alexpopov@bmstu.ru), <br> *МГТУ им. Н.Э.Баумана*   |   [Михаил Гейне](mailto:mike.geine@gmail.com)  <br>  *МГТУ им. Н.Э.Баумана*    |   [Гор Парамазян](mailto:anon@anon.ru)  <br>  *МГТУ им. Н.Э.Баумана*    |   [Петр Шумнов](mailto:anon@anon.ru)  <br>  *МГТУ им. Н.Э.Баумана*    |
 

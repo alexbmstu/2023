@@ -13,10 +13,7 @@
 Существует несколько видов графов, отличающихся свойствами предикатов инцидентности – *неориентированные, ориентированные, гипер- и ультраграфы, метаграфы*. 
 
 
-![](assets/6.jpg)
-![](assets/9.jpg)
-![](assets/11.jpg)
-![](assets/12.jpg)
+![Рисунок 1 — Графы знаний](assets/graphs.jpg)
 **Рисунок 1 — Графы знаний**
 
 Графы знаний являются способом представления модели знаний в виде графовой структуры. Технологии представления и обработки знаний в виде графов приобрели большое значение во многих областях, в которых другие методы показали низкую эффективность. Благодаря способности сохранять информацию о различных объектах и явлениях и учитывать связи между ними, графы знаний могут использоваться при анализе больших данных в биоинформатике \[<a href="https://www.researchgate.net/publication/51083566_Using_graph_theory_to_analyze_biological_networks" target="_blank">1</a>\], в персонифицированной медицине, системах безопасности городов \[<a href="https://www.researchgate.net/publication/349236112_A_Metamodel_and_Framework_for_Artificial_General_Intelligence_From_Theory_to_Practice" target="_blank">2</a>\]\[<a href="https://www.researchgate.net/publication/335444390_A_reasoning_based_model_for_anomaly_detection_in_the_Smart_City_domain" target="_blank">3</a>\]\[<a href="https://www.researchgate.net/publication/321306827_A_Survey_on_Network_Embedding" target="_blank">4</a>\]\[<a href="https://cs.stanford.edu/people/jure/pubs/graphrepresentation-ieee17.pdf" target="_blank">5</a>\]\[<a href="https://www.researchgate.net/publication/332881469_ConceptNet_55_An_Open_Multilingual_Graph_of_General_Knowledge" target="_blank">6</a>\], в компьютерных сетях, финансовом секторе, при контроле сложного промышленного производства, для анализа информации социальных сетей и во многих других областях.  

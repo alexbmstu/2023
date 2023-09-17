@@ -8,9 +8,9 @@
 
 **Эксперты**
 
-|   <img src="assets/anastasia_popova.png" width="150">  |   <img src="assets/popova_aleksandra.png" width="150">  |   <img src="assets/892_oooo.plus.png" width="150">  | 
+|   <img src="assets/anastasia_popova.png" width="150">  |   <img src="assets/aleksandra_popova.png" width="150">  |   <img src="assets/892_oooo.plus.png" width="150">  | 
 |: --------------------------------------- :|: --------------------------------------- :|: -------------------------------------- :|: ------------------------------------------------ :|: --------------------------------------- :|
-|  [Попова Анастасия](mailto:anon@anon.ru)<br>*МГК им. П.И.Чайковского* |  [Попова Алекандра](mailto:anon@anon.ru) <br>*RWTH Aachen Univ*   |  [Константин Горбунов](mailto:anon@anon.ru)  <br>*НИИ Системной биологии<br>и медицины<br>Роспотребнадзора*   |    
+|  [Попова Анастасия](mailto:anon@anon.ru)<br>*МГК им. П.И.Чайковского* |  [Попова Алекандра](mailto:anon@anon.ru) <br>*RWTH*   |  [Константин Горбунов](mailto:anon@anon.ru)  <br>*НИИ Системной биологии<br>и медицины<br>Роспотребнадзора*   |    
 
 
 

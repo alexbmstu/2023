@@ -60,8 +60,8 @@ img
 }
 .image-caption {
   text-align: center;
-  font-size: .8rem;
-  color: lightgrey;
+  font-size: .12rem;
+  color: grey;
 }
 
 </style>

@@ -8,7 +8,7 @@ img
     float:none;
     margin-left:auto;
     margin-right:auto;
-    width:60%;
+    width:90%;
 }
 
 /* Create a CSS class to style images to left-align, or "float left" */
@@ -275,7 +275,7 @@ img
 В качестве единицы передаваемых данных принят блок размером 384Б, который передается между хост-подсистемой и группой ядер CG с помощью механизмов прямого доступа к памяти.
 
 
-<img src="assets/Leonhard_v4_1.png" width="480" />
+<img src="assets/Leonhard_v4_1.png" width="400" />
 
 **Рисунок 8 — Структура микропроцессора Леонард Эйлер**
 

@@ -48,7 +48,7 @@ img
     float:none;
     margin-left:auto;
     margin-right:auto;
-    width:20%;
+    width:120;
 }
 
 /* Create a CSS class to style images to left-align, or "float left" */

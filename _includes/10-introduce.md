@@ -41,11 +41,11 @@ img
     width:40%;
 }
 
-/* Create a CSS class to style images to 40% */
+/* Create a CSS class to style images to 20% */
 .smallPic
 {
-    display:block;
-    float:none;
+    display:inline-block;
+    float:left;
     margin-left:auto;
     margin-right:auto;
     width:120;

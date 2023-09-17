@@ -41,6 +41,16 @@ img
     width:40%;
 }
 
+/* Create a CSS class to style images to 40% */
+.smallPic
+{
+    display:block;
+    float:none;
+    margin-left:auto;
+    margin-right:auto;
+    width:20%;
+}
+
 /* Create a CSS class to style images to left-align, or "float left" */
 .leftAlign
 {

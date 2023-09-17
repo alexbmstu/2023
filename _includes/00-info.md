@@ -1,14 +1,14 @@
 **Руководители практикума**
 
 
-|   <img src="assets/aleksei_popov.png" width="150"> |  <img src="assets/stanislav_ibragimov.png" width="150">  |  <img src="assets/egor_dubrovin.png" width="150">  |  <img src="assets/Li.png" width="150">  |  <img src="assets/PXL_20220430_152105151.MP-modified.png" width="150">  |
+|   <img src="assets/aleksei_popov.png" class="smallPic"> |  <img src="assets/stanislav_ibragimov.png" class="smallPic">  |  <img src="assets/egor_dubrovin.png" class="smallPic">  |  <img src="assets/Li.png" class="smallPic">  |  <img src="assets/PXL_20220430_152105151.MP-modified.png" class="smallPic">  |
 |: --------------------------------------- :|: --------------------------------------- :|: --------------------------------------- :|: --------------------------------------- :|: --------------------------------------- :|
 |   [Алексей Попов](mailto:alexpopov@bmstu.ru), <br> *МГТУ им. Н.Э.Баумана*   |   [Станислав  Ибрагимов](mailto:ibragimov@bmstu.ru)  <br>  *МГТУ им. Н.Э.Баумана*    |   [Егор Дубровин](mailto:dubrovin.en@ya.ru)  <br>  *МГТУ им. Н.Э.Баумана*    |   [Ли Цзяцзянь](mailto:dreki.li@mail.ru)  <br>  *МГТУ им. Н.Э.Баумана*    |   [Михаил Гейне](mailto:mike.geine@gmail.com)  <br>  *МГТУ им. Н.Э.Баумана*    |
  
 
 **Эксперты**
 
-|   <img src="assets/anastasia_popova.png" width="150">  |   <img src="assets/aleksandra_popova.png" width="150">  |   <img src="assets/892_oooo.plus.png" width="150">  | 
+|   <img src="assets/anastasia_popova.png" class="smallPic">  |   <img src="assets/aleksandra_popova.png" class="smallPic">  |   <img src="assets/892_oooo.plus.png" class="smallPic">  | 
 |: --------------------------------------- :|: --------------------------------------- :|: -------------------------------------- :|: ------------------------------------------------ :|: --------------------------------------- :|
 |  [Попова Анастасия](mailto:anon@anon.ru)<br>*МГК им. П.И.Чайковского* |  [Попова Алекандра](mailto:anon@anon.ru) <br>*RWTH*   |  [Константин Горбунов](mailto:anon@anon.ru)  <br>*НИИ Системной биологии<br>и медицины<br>Роспотребнадзора*   |    
 

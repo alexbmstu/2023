@@ -11,10 +11,20 @@ img
     width:90%;
 }
 
-/* Create a CSS class to style images to 40% */
+/* Create a CSS class to style images to 90% */
 .normalPic
 {
-    display:inline-block;
+    display:block;
+    float:none;
+    margin-left:auto;
+    margin-right:auto;
+    width:90%;
+}
+
+/* Create a CSS class to style images to 60% */
+.normalPic
+{
+    display:block;
     float:none;
     margin-left:auto;
     margin-right:auto;
@@ -24,7 +34,7 @@ img
 /* Create a CSS class to style images to 40% */
 .thinPic
 {
-    display:inline-block;
+    display:block;
     float:none;
     margin-left:auto;
     margin-right:auto;
@@ -243,7 +253,7 @@ img
 
 Структурная схема одного узла представлена на рисунке 7.
 
-<img src="assets/Teragraph_v2_rus.png" class="normalPic"/>
+<img src="assets/Teragraph_v2_rus.png" class="fullPic"/>
 
 **Рисунок 7 — Структура гетерогенного узла обработки графов**
 

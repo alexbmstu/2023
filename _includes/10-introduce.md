@@ -48,7 +48,7 @@ img
     float:left;
     margin-left:none;
     margin-right:none;
-    width:120px;
+    width:150px;
 }
 
 /* Create a CSS class to style images to left-align, or "float left" */
@@ -401,10 +401,10 @@ img
 
 **Таблица 2 - Описание частей библиотеки lnh64 L0**
 
-| Раздел библиотеки                                                     | Описание                                                    | Язык программирования | Архитектура, Компилятор | Способ отладки |
-|:----------------------------------------------------------------------|-------------------------------------------------------------|------------------------------------------------:|
-| <a href="https://latex.bmstu.ru/gitlab/lnh64_l0/host-lib" target="_blank">Host Lib</a> |   Управления хост-подсистемой и взаимодействие с ядрами GPC | C/C++, объектная модель | x86, g++                | Jupyter,VSCode,gdb |
-| <a href="https://latex.bmstu.ru/gitlab/lnh64_l0/sw-kernel-lib" target="_blank">SW Kernel Lib</a> | Взаимодействие с микропроцессором lnh64           | C/C++, процедурная модель | riscv64, g++            | Вывод сообщений  |
+| Раздел библиотеки                                                                                | Описание                                                  | Язык программирования     | Архитектура, Компилятор | Способ отладки     |
+|--------------------------------------------------------------------------------------------------|-----------------------------------------------------------|---------------------------|-------------------------|--------------------|
+| <a href="https://latex.bmstu.ru/gitlab/lnh64_l0/host-lib" target="_blank">Host Lib</a>           | Управления хост-подсистемой и взаимодействие с ядрами GPC | C/C++, объектная модель   | x86, g++                | Jupyter,VSCode,gdb |
+| <a href="https://latex.bmstu.ru/gitlab/lnh64_l0/sw-kernel-lib" target="_blank">SW Kernel Lib</a> | Взаимодействие с микропроцессором lnh64                   | C/C++, процедурная модель | riscv64, g++            | Вывод сообщений    |
 
 Функциональные возможности Host Lib:
 
@@ -436,7 +436,7 @@ img
 #include <time.h>
 #include "host_main.h"
 
-#define BUF_SIZE 117440512*sizeof(unsigned long long) //большой массив
+#define BUF_SIZE 117440512*sizeof(unsigned long long)
 
 #define handle_error(msg) \
            do { perror(msg); exit(EXIT_FAILURE); } while (0)
@@ -457,7 +457,7 @@ int main(int argc, char** argv)
 	}
 
 	//Захват ядра gpc и запись sw_kernel
-	gpc64_inst = new gpc(); //создание экземпляра класса gpc
+	gpc64_inst = new gpc();
 	printf("Open gpc on %s\n",gpc64_inst->gpc_dev_path);
 	if (gpc64_inst->load_swk(argv[1])==0) {
 		printf("Rawbinary loaded from %s\n",argv[1]);
@@ -484,13 +484,13 @@ int main(int argc, char** argv)
 	unsigned long long *buf_out=(unsigned long long *)malloc(BUF_SIZE);
 	unsigned long long *buf_in=(unsigned long long *)malloc(BUF_SIZE);
 	for (int i=0;i<(BUF_SIZE>>3);i++) {
-		buf_out[i]=rand();
+		buf_out[i]=(rand()<<32)|rand();
 	}
 	//Запуск потоков приема-передачи
-	gpc64_inst->mq_send(BUF_SIZE,(char*)buf_out);
-	gpc64_inst->mq_receive(BUF_SIZE,(char*)buf_in);
-	gpc64_inst->mq_send_join();
-	gpc64_inst->mq_receive_join();
+	auto send_thread = gpc64_inst->mq_send(BUF_SIZE,(char*)buf_out);
+	auto receive_thread =  gpc64_inst->mq_receive(BUF_SIZE,(char*)buf_in);
+	send_thread->join();
+	receive_thread->join();
 	for (int i=0;i<(BUF_SIZE>>3);i++) {
 		if (buf_out[i]!=buf_in[i]) {
 			printf("Error: buf_out[%d]=0x%016llx - buf_in[%d]=0x%016llx\n",i,buf_out[i],i,buf_in[i]);
@@ -499,13 +499,12 @@ int main(int argc, char** argv)
 	}
 	if (!err) {printf("Test done\n");}
 
-    //Ожидание завершения. Закомментировать, если нужно запускать другие обработчики
-	gpc64_inst->finish(); //никогда не случится, т.к. обработчик echo_mq работает в бесконечном цикле
+	// gpc64_inst->finish(); //newer finished
 
 	//Освобождение ресурсов
 	free(gpc64_inst);
 	return 0;
-}	
+}
 ``` 
 
 Для представленного листинга должен быть также создан и скомпилирован ответный код для микропроцессора riscv64im, который будет работать в составе гетерогенного ядра обработки графов.
@@ -638,17 +637,14 @@ void echo_mq() {
 Взаимодействие обработчика sw_kernel и хост-подсистемы осуществляется через апааратные очереди сообщений c2h и h2c с помощью команд передачи и приема (`mq_send()` и `mq_receive()`). Передача сообщений на аппаратном уровне выполняется с использованием механизма прямого доступа к памяти, что существенно ускоряет обмен больших блоков данных. Отметим, что данные могут ритмично передаваться только в том случае, если принимающая сторона выполняет их чтение. В противном случае внутренние буферы будут переполнены, и передача временно прекратится.
 В хост подсистеме реализованы многопоточные асинхронные методы передачи и приема сообщений, блокирующие доступ других потоков к приему и передаче. Это позволяет запускать множество потоков одновременно, и при этом не нарушать последовательность их запуска. Рассмотрим методы класса gpc, описанного в библиотеке `lnh64 L0`:
 
-**Таблица 3 - Методы класса gpc для передачи и приема сообщений хост-подсистемы**
+**Таблица 3 - Методы класса gpc для передачи и приема сообщений хост-подсистемой**
 
-| Метод класса                                        | Назначение                                                                          |
-|-----------------------------------------------------|-------------------------------------------------------------------------------------|
-| void **mq_send**(unsigned long long data)           | Передача 8 байт (базовый размер операнда lnh64) в gpc                               |
-| void **mq_send**(unsigned int bufsize,char *buf)    | Передача блока данных из буфера buf, bufsize байт                                   |
-| void **mq_send_join**()                             | Ожидание завершения потока передачи (любого из ранее описанных методов mq_send)     |
-| void **mq_receive**(unsigned int bufsize,char *buf) | Получение блока данных из gpc в буфер buf, bufsize байт                             |
-| unsigned long long mq_receive()                 | Получение 8 байт из gpc                                                             |
-| void **mq_receive_join**()                          | Ожидание завершения потока получения (любого из ранее описанных методов mq_receive) |
-
+| Метод класса                                                 | Назначение                                                                                                                                                                                                               |
+|--------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| void **mq_send**(unsigned long long data)                    | Синхронная передача 8 байт (базовый размер операнда lnh64) в gpc.                                                                                                                                                        |
+| std::thread*  **mq_send**(unsigned int bufsize,char *buf)    | Асинхронная передача блока данных из буфера buf, bufsize байт. Возвращает указатель на объект потока thread, в котором выполняется запись. Несколько запущенных потоков выполняются последовательно в порядке запуска.   |
+| unsigned long long mq_receive()                              | Синхронное получение 8 байт из gpc. Возвращает данные типа unsigned long long                                                                                                                                            |
+| std::thread*  **mq_receive**(unsigned int bufsize,char *buf) | Асинхронный прием блока данных из gpc в буфер buf, bufsize байт. Возвращает указатель на объект потока thread, в котором выполняется чтение. Несколько запущенных потоков выполняются последовательно в порядке запуска. |
 
 Потоки mq_send() и mq_receive() могут и должны выполняться параллельно, что приводит к необходимости синхронизации вычислений в хост-подсистеме и gpc. В связи с этимна обоих сторонах реализован метод `sync()`, осуществляющий процедуру рукопожатия двух сторон.
 
@@ -683,7 +679,7 @@ void sync()
 Для реализации всех необходимых разработкичку действий в библиотеке sw_kernel-lib реализованы следующие функции:
 
 
-**Таблица 4 - Функции для передачи и приема сообщений sw_kernel**
+**Таблица 4 - Функции для передачи и приема сообщений программным ядром sw_kernel**
 
 | Функция                                                      | Назначение                                                                                     |
 |--------------------------------------------------------------|------------------------------------------------------------------------------------------------|
@@ -1162,7 +1158,9 @@ SPE lnh64 использует беззнаковое сравнение 64 би
 ```
 
 
-Далее, объявлены макросы INLINE инстанцирования структур и обращения к объединению:
+
+
+<!-- Далее, объявлены макросы INLINE инстанцирования структур и обращения к объединению:
 
 ```c
  //Макросы для формирования структур inline 
@@ -1189,8 +1187,8 @@ SPE lnh64 использует беззнаковое сравнение 64 би
  lnh_ins_async(A,INLINE(A_key,{.id=atr0,.index=0}),INLINE(A_value,{.atr0=0x1234,.atr1=0,.atr2=0,.atr3=0,}));  
 ```
 
-<!-- Подробный пример представлен в проекте <a href="https://gitlab.com/leonhard-x64-xrt-v2/btwc-example/btwc-dijkstra-xrt/-/blob/main/dijkstra.c" target="_blank">dijkstra.c</a>. -->
-
+<!-- Подробный пример представлен в проекте <a href="https://gitlab.com/leonhard-x64-xrt-v2/btwc-example/btwc-dijkstra-xrt/-/blob/main/dijkstra.c" target="_blank">dijkstra.c</a>. 
+-->
 
 ## 2.7. Программная модель микропроцессора Леонард Эйлер
 
@@ -1308,221 +1306,287 @@ SPE lnh64 использует беззнаковое сравнение 64 би
 
 ---
 
-# **3. Практакум №1. Разработка и отладка программ в вычислительном комплексе Тераграф с помощью библиотеки leonhard x64 xrt** 
+# **3. Практакум №1. Разработка и отладка программ в вычислительном комплексе Тераграф** 
 
 *Практикум посвящен освоению принципов работы вычислительного комплекса Тераграф и получению практических навыков решения задач обработки множеств на основе гетерогенной вычислительной структуры. В ходе практикума необходимо ознакомиться с типовой структурой двух взаимодействующих программ: хост-подсистемы и программного ядра sw_kernel. Для выполнения практикума предоставляется доступ к облачной платформе [https://devlab.bmstu.ru](devlab.bmstu.ru) с установленными ускорительными картами микропроцессора Леонард Эйлер и настроенными средствами сборки проектов.*
 
-## 3.1. Пример взаимодествия устройств 
+## 3.1. Пример взаимодествия устройств: система определения ролей полльзователя.
 
-Рассмотрим следующие примеры кода подсистемы и программного ядра, которые мы будем использовать в практикуме. Пример выполняет следующие действия: 
-
-* Хост-подсистема инициализирует ядра GPC: ```lnh_inst.load_sw_kernel(argv[2], group, core);```, после чего становится возможным запуск обработчиков программного ядра sw_kernel. В практикуме используется версия микропроцессора Леонард Эйлер с одной группой и двумя ядрами GPC, при этом в файле gpc_defs.h разрешено использование только ядра #0 группы #0 (настройка может быть изменена пользователем).
-
-* Хост-подсистема выделяет память под буферы gpc2host_buffer и host2gpc_buffer
-
-* В буфере host2gpc_buffer инициализируется массив ключей и значений для записи в GPC.
-
-* Запускается обработчик insert_burst и запускается механизм прямого доступа к памяти для записи host2gpc_buffer в глобальную память группы #0. Последовательность указанных действий может быть обратной: сначала может быть запущен механизм DMA, после чего запускается обработчик.
-
-* Хост-подсистема ожидает завершения копирования памяти (buf_write_join) для синхронизации процессов.
-
-* Хост-подсистема передает сообщение с количеством ключей и значений (mq_send(...)).
-
-* Программное ядро в обработчике insert_burst получает сообщение и выделяет буфер (buffer) для хранения данных в RAM CPE.
-
-* Программное ядро копирует данные в буфер и последовательно вызывает команду INS микропроцессора lnh64: ```lnh_ins_sync(TEST_STRUCTURE,buffer[2*i],buffer[2*i+1])```. 
-
-
-![Последовательность действий для реализации пакетной обработки](assets/part3_call_example01.jpg)
-**Последовательность действий для реализации пакетной обработки**
-
-* Далее происходит запуск обработчика для последовательного обхода множества ключей и выдачи их обратно в хост-подсистему.
-
-* Программное ядро в обработчике search_burst получает количество ключей в структуре (```unsigned int count = lnh_get_num(TEST_STRUCTURE)```)
-
-* Обход структуры начинается с выборки минимального ключа (```lnh_get_first(TEST_STRUCTURE)```)
-
-* Далее осуществляется запись ключа и значения в буфер для обратной передачи в хост-подсистему. 
-
-* Используя итерационный цикл, или же проверяя результат выполнения функции ```lnh_next(TEST_STRUCTURE,lnh_core.result.key)``` цикл повторяется до обхода всей структуры TEST_STRUCTURE. 
-
-* Альтернативно может быть использован следующий код для последовательного обхода структуры:
-
-```
- lnh_get_first(TEST_STRUCTURE);
- do {
- 	//lnh_core.result.key   - найденный ключ
-	//lnh_core.result.value - найденное значение
-    ...
- } while (lnh_next(TEST_STRUCTURE,lnh_core.result.key));
-```
-
-* По завершению обхода программное ядро посылает сообщение с количеством переданных ключей и значений. 
-
-* Хост-подсистема ожидает получения сообщения, после чего последовательно проверяет, что ключ в буфере совпадает с ожидаемым. 
-
-* В итоге выдается сообщение о результате тестирования.
-
-Код приложения для хост-подсистемы показан ниже:
+Рассмотрим следующие примеры кода подсистемы и программного ядра, которые мы будем использовать в практикуме. Система определения ролей полльзователя сохраняет в памяти микропроцессора с набором команд дисретной математики DISC тестовый набор ролей пользователей (1К пользователей с 1K ролями каждого). Система отвечает на запросы: какие роли пользователя были использованы начиная с момента времени `time`. Пример выполняет следующие действия: 
+* Хост подсистема инициализирует gpc программным ядром `sw_kernel.rawbinary`.
 
 ```c
-	// /*
-	//  *
-	//  * Запись множества из BURST key-value и его последовательное чтение через Global Memory Buffer 
-	//  *
-	//  */
-
-
-	//Выделение памяти под буферы gpc2host и host2gpc для каждого ядра и группы
-	uint64_t *host2gpc_buffer[LNH_GROUPS_COUNT][LNH_MAX_CORES_IN_GROUP];
-	__foreach_core(group, core)
-	{
-		host2gpc_buffer[group][core] = (uint64_t*) malloc(2*BURST*sizeof(uint64_t));
+    gpc64_inst = new gpc();
+	log<<"Открывается доступ к "<<gpc64_inst->gpc_dev_path<<endl;
+	if (gpc64_inst->load_swk(argv[1])==0) {
+		log<<"Программное ядро загружено из файла "<<argv[1]<<endl;
 	}
-	uint64_t *gpc2host_buffer[LNH_GROUPS_COUNT][LNH_MAX_CORES_IN_GROUP];
-	__foreach_core(group, core)
+	else {
+		log<<"Ошибка загрузки sw_kernel файла << argv[1]"<<endl;
+		return -1;
+	}
+```
+
+* Если программное ядро успешно загружено, хост подсистема запускает в gpc обработчик `update`, выполняющий прием и сапись клчей и значений в SPE.
+Код обработчика, функуионирующего в `sw_kernel` представлен ниже:
+```c
+//-------------------------------------------------------------
+//      Вставка ключа и значения в структуру
+//-------------------------------------------------------------
+
+void update() {
+
+        while(1){
+                users::key key=users::key::from_int(mq_receive());
+                if (key==-1ull) break;
+                users::val val=users::val::from_int(mq_receive());
+                // Поля структуры могут записываться явно следующим образом 
+                //      auto new_key = users::key{.rec_idx=1,.user=2};
+                //      auto new_val = users::val{.role=3,.lst_time=0}
+                // Копирование полей в переменные можно выполнить следующим образом:
+                //      auto user = key.user;
+                //      auto [lst_time,role] = val;
+                USERS.ins_async(key,val); //Вставка в таблицу с типизацией uint64_t
+        } 
+}
+```
+* Далее хост-подсистема иициализирует поток сообщений к программному ядру. Для этого могут быть использованы два способа:
+1. 	Последовательная пересылка ключей и значений unsigned long long короткими сообщениями.
+
+```c
+    for (uint32_t user=0;user<TEST_USER_COUNT;user++) {
+		for (uint32_t idx=0;idx<TEST_ROLE_COUNT;idx++,offs+=2) {
+			gpc64_inst->mq_send(users::key{.idx=idx,.user=user}); //запись о роли #idx
+			gpc64_inst->mq_send(users::val{.role=idx,.time=time_t(0)}); //роль и время доступа
+		}
+    }
+```
+2.  Заполнение буфера данных и передача его драйверу (блочная передача). Данный способ обеспечивает большую пропускную способность передачи, так как реализуется через механизм прямого доступа к памяти. Передача данных из буфера выполняется в асинхронном режиме (процесс запускается по команде `mq_send`). Для ожидания момента завершения передачи метод `mq_send` возвращает указатель на поток передачи. Далее, если требуется ожидание завершения процесса передачи, необходимо исползовать синхронизирующую команду `join` (send_buf_th->join()). Пример кода блочной передачи приведен ниже: 
+```c
+	unsigned long long *buf = (unsigned long long*)malloc(sizeof(unsigned long long)*TEST_USER_COUNT*TEST_ROLE_COUNT*2);
+	for (uint32_t user=0,offs=0;user<TEST_USER_COUNT;user++) {
+		for (uint32_t idx=0;idx<TEST_ROLE_COUNT;idx++,offs+=2) {
+			buf[offs]=users::key{.idx=idx,.user=user};
+			buf[offs+1]=users::val{.role=idx,.time=time_t(idx*3600)};
+		}
+	}
+	auto send_buf_th = gpc64_inst->mq_send(sizeof(unsigned long long)*TEST_USER_COUNT*TEST_ROLE_COUNT*2,(char*)buf);
+	send_buf_th->join();
+	free(buf);
+ ```
+* По завершению передачи требуемов sw_kernel посылается терминальный символ (`0xffffffffffffffff`): 
+```c
+	//Терминальный символ
+	gpc64_inst->mq_send(-1ull);
+```
+* В ответ на терминальный символ `sw_kernel` завершает обработчик `update`, и код хост-подсистемы запускает обработчик запросов поиска `select`.
+* Система готова к приему запросов пользователя. Формат таблицы, представленной в SPE микропроцессоре следующий [commin.sh](https://latex.bmstu.ru/gitlab/hackathon2023/lab2/lab2/-/blob/main/include/common_struct.h?ref_type=heads#L55):
+```c
+	//Запись для формирования ключей (* - наиболее значимые биты поля)
+	STRUCT(key)
 	{
-		gpc2host_buffer[group][core] = (uint64_t*) malloc(2*BURST*sizeof(uint64_t));
+	    uint32_t	idx	    :idx_bits;	//Поле 0:
+	    uint32_t	user    :32; 		//Поле 1*
+	};
+
+	//Запись для формирования значений
+	STRUCT(val)
+	{
+	    uint32_t	role	:32;		//Поле 0:
+	    time_t		time    :32; 		//Поле 1*
+	};
+```
+Поле ключа состоит из полей: `user` (поле идентификатора польователя, старшая часть ключа) и `idx` (поле индекса записи о роли пользователя. младшая часть ключа).
+Поле значения состоит из полей: `role` (поле идентификатора роли) и `time` (поле времени последнего доступа).
+
+* Запрос состоит в выборе тех ролей пользователя из таблицы `users`, которые были использованы позднее момента времени `time`, заданного в запросе. Например:
+```sql
+select role from users where user=5 and time>100000;
+```
+* Программный код хост-системы использует резулярные выражения (`regex`) для выделения полей в запросе `select`.
+* Поля запроса `user` и `time` передаются в `sw_kernel`:
+```c
+        gpc64_inst->mq_send(stoi(match_query1[4])); //пользователь
+        gpc64_inst->mq_send(stoi(match_query1[6])); //время доступа
+```
+* Микропроцессор DISC выбирает из ассоциативной памяти все роли пользователя `user` и определяет те из них, которые соответствуют условию запроса (например, `time>100000`). Найденные роли передаются в хост-подсистему. 
+* В итоге, хост подсистема выдает сообщение о результатах поиска в поток cout.
+
+Полный код приложения для хост-подсистемы показан ниже:
+
+```c
+
+#define TEST_USER_COUNT 1000
+#define TEST_ROLE_COUNT 1000
+
+int main(int argc, char** argv)
+{
+	ofstream log("lab2.log"); //поток вывода сообщений
+	unsigned long long offs=0ull;
+	gpc *gpc64_inst; //указатель на класс gpc
+	regex select_regex_query("select +(.*?) +from +(.*?) +where +(.*?)=(.*?) +and +(.*?)>(.*);", //запрос
+            std::regex_constants::ECMAScript | std::regex_constants::icase);
+
+	//Инициализация gpc
+	if (argc<2) {
+		log<<"Использование: host_main <путь к файлу rawbinary>"<<endl;
+		return -1;
 	}
 
-	//Создание массива ключей и значений для записи в lnh64
-	__foreach_core(group, core)
-	{
-		for (int i=0;i<BURST;i++) {
-			//Первый элемент массива uint64_t - key
-			host2gpc_buffer[group][core][2*i] = rand64();
-			//Второй uint64_t - value
-			host2gpc_buffer[group][core][2*i+1] = i;
+	//Захват ядра gpc и запись sw_kernel
+	gpc64_inst = new gpc();
+	log<<"Открывается доступ к "<<gpc64_inst->gpc_dev_path<<endl;
+	if (gpc64_inst->load_swk(argv[1])==0) {
+		log<<"Программное ядро загружено из файла "<<argv[1]<<endl;
+	}
+	else {
+		log<<"Ошибка загрузки sw_kernel файла << argv[1]"<<endl;
+		return -1;
+	}
 
+	//Инициализация таблицы для вложенного запроса
+	gpc64_inst->start(__event__(update)); //обработчик вставки 
+
+	//1-й вариант: пересылка коротких сообщений
+	for (uint32_t user=0;user<TEST_USER_COUNT;user++) {
+		for (uint32_t idx=0;idx<TEST_ROLE_COUNT;idx++,offs+=2) {
+			gpc64_inst->mq_send(users::key{.idx=idx,.user=user}); //запись о роли #idx
+			gpc64_inst->mq_send(users::val{.role=idx,.time=time_t(0)}); //роль и время доступа
 		}
 	}
 
-	//Запуск обработчика insert_burst
-	__foreach_core(group, core) {
-		lnh_inst.gpc[group][core]->start_async(__event__(insert_burst));
+	//2-й вариант: блочная передача
+	unsigned long long *buf = (unsigned long long*)malloc(sizeof(unsigned long long)*TEST_USER_COUNT*TEST_ROLE_COUNT*2);
+	for (uint32_t user=0,offs=0;user<TEST_USER_COUNT;user++) {
+		for (uint32_t idx=0;idx<TEST_ROLE_COUNT;idx++,offs+=2) {
+			buf[offs]=users::key{.idx=idx,.user=user};
+			buf[offs+1]=users::val{.role=idx,.time=time_t(idx*3600)};
+		}
 	}
+	auto send_buf_th = gpc64_inst->mq_send(sizeof(unsigned long long)*TEST_USER_COUNT*TEST_ROLE_COUNT*2,(char*)buf);
+	send_buf_th->join();
+	free(buf);
+	//Терминальный символ
+	gpc64_inst->mq_send(-1ull);
 
-	//DMA запись массива host2gpc_buffer в глобальную память
-	__foreach_core(group, core) {
-		lnh_inst.gpc[group][core]->buf_write(BURST*2*sizeof(uint64_t),(char*)host2gpc_buffer[group][core]);
-	}
-
-	//Ожидание завершения DMA
-	__foreach_core(group, core) {
-		lnh_inst.gpc[group][core]->buf_write_join();
-	}
-
-	//Передать количество key-value
-	__foreach_core(group, core) {
-		lnh_inst.gpc[group][core]->mq_send(BURST);
-	}
-
-	//Запуск обработчика для последовательного обхода множества ключей
-	__foreach_core(group, core) {
-		lnh_inst.gpc[group][core]->start_async(__event__(search_burst));
-	}
-
-	//Получить количество ключей
-	unsigned int count[LNH_GROUPS_COUNT][LNH_MAX_CORES_IN_GROUP];
-
-	__foreach_core(group, core) {
-		count[group][core] = lnh_inst.gpc[group][core]->mq_receive();
-	}
-
-
-	//Прочитать количество ключей
-	__foreach_core(group, core) {
-		lnh_inst.gpc[group][core]->buf_read(count[group][core]*2*sizeof(uint64_t),(char*)gpc2host_buffer[group][core]);
-	}
-
-	//Ожидание завершения DMA
-	__foreach_core(group, core) {
-		lnh_inst.gpc[group][core]->buf_read_join();
-	}
-
-
-	bool error = false;
-	//Проверка целостности данных
-	__foreach_core(group, core) {
-		for (int i=0; i<count[group][core]; i++) {
-			uint64_t key = gpc2host_buffer[group][core][2*i];
-			uint64_t value = gpc2host_buffer[group][core][2*i+1];
-			uint64_t orig_key = host2gpc_buffer[group][core][2*value];
-			if (key != orig_key) {
-				error = true;
+	gpc64_inst->start(__event__(select)); //обработчик запроса поиска 
+	while(1) {
+		string query1;
+		//разбор полей запроса
+		smatch match_query1;
+		getline(cin, query1);
+		log<<"Введен запрос: "<<query1<<endl;
+		if (!query1.compare("exit")) {
+			gpc64_inst->mq_send(-1ull);
+			break;
+		}
+		if (regex_match (query1, match_query1, select_regex_query) && 
+			match_query1[3]=="user" && 
+			match_query1[5] == "time") {
+			//match_query1[1] - возвращаемое поле запроса
+			//match_query1[2] - номер структуры запроса 
+			//match_query1[3] - поле поиска 1
+			//match_query1[4] - значение поля поиска 1
+			//match_query1[5] - поле поиска 2
+			//match_query1[6] - значение поля поиска 2
+			log << "Запрос принят в обработку." << endl;
+			log << "Поиск ролей пользователя " << match_query1[4] << "и time > " << time_t(stoi(match_query1[6])) << endl;
+			gpc64_inst->mq_send(stoi(match_query1[4])); //пользователь
+			gpc64_inst->mq_send(stoi(match_query1[6])); //время доступа
+			while (1) {
+				uint64_t result = gpc64_inst->mq_receive();
+				if (result!=-1ull) {
+					cout << "Роль: " << users::val::from_int(result).role << " - ";
+					cout << "Время доступа: " << users::val::from_int(result).time << endl;
+				} else {
+					break;
+				}
 			}
+		} else {
+      		log << "Ошибка в запросе!" << endl;
 		}
 	}
-
-
-	__foreach_core(group, core) {
-		free(host2gpc_buffer[group][core]);
-		free(gpc2host_buffer[group][core]);
-	}
-
-	if (!error)
-		printf("Тест пройден успешно!\n");
-	else
-		printf("Тест завершен с ошибкой!\n");
-
+	log << "Выход!" << endl;
+	return 0;
+}
 ```
 
-Ниже показаны примеры обработчиков пакетной вставки в структуру insert_burst и пакетного чтения структуры search_burst.
-
+Код соответствующего кода sw_kernel представлен ниже.
 
 ```c
+extern lnh lnh_core;
+volatile unsigned int event_source;
+
+int main(void) {
+    /////////////////////////////////////////////////////////
+    //                  Main Event Loop
+    /////////////////////////////////////////////////////////
+    //Leonhard driver structure should be initialised
+    lnh_init();
+    for (;;) {
+        //Wait for event
+        event_source = wait_event();
+        set_gpc_state(BUSY);
+        switch(event_source) {
+            /////////////////////////////////////////////
+            //  Measure GPN operation frequency
+            /////////////////////////////////////////////
+            case __event__(update) : update(); break;
+            case __event__(select) : select(); break;
+        }
+        set_gpc_state(IDLE);
+    }
+}
+    
 //-------------------------------------------------------------
-//      Получить пакет из глобальной памяти и отправить в lnh64
+//      Вставка ключа и значения в структуру
 //-------------------------------------------------------------
  
-void insert_burst() {
+void update() {
 
-    //Удаление данных из структур
-    lnh_del_str_sync(TEST_STRUCTURE);
-    //Объявление переменных
-    unsigned int count = mq_receive();
-    unsigned int size_in_bytes = 2*count*sizeof(uint64_t);
-    //Создание буфера для приема пакета
-    uint64_t *buffer = (uint64_t*)malloc(size_in_bytes);
-    //Чтение пакета в RAM
-    buf_read(size_in_bytes, (char*)buffer);
-    //Обработка пакета - запись 
-    for (int i=0; i<count; i++) {
-        lnh_ins_sync(TEST_STRUCTURE,buffer[2*i],buffer[2*i+1]);
-    }
-    lnh_sync();
-    free(buffer);
+        while(1){
+                users::key key=users::key::from_int(mq_receive());
+                if (key==-1ull) break;
+                users::val val=users::val::from_int(mq_receive());
+                // Поля структуры могут записываться явно следующим образом 
+                //      auto new_key = users::key{.rec_idx=1,.user=2};
+                //      auto new_val = users::val{.role=3,.lst_time=0}
+                // Копирование полей в переменные можно выполнить следующим образом:
+                //      auto user = key.user;
+                //      auto [lst_time,role] = val;
+                USERS.ins_async(key,val); //Вставка в таблицу с типизацией uint64_t
+        } 
 }
 
 
 //-------------------------------------------------------------
-//      Обход структуры lnh64 и запись в глобальную память 
+//      Передать все роли пользователя и время доступа 
 //-------------------------------------------------------------
  
-void search_burst() {
+void select() {
+        while(1){
+                uint32_t quser = mq_receive();
+                if (quser==-1) break;
+                uint32_t qtime = mq_receive();
+                //Найдем все роли пользователя и последнее время доступа:
+                // Результаты поиска могут быть доступны следующим образом:
+                //      auto user = USERS.search(users::key{.idx=1,.user=2}).key().user;
+                //      auto role = USERS.search(users::key{.idx=3,.user=4}).value().role;
 
-    //Ожидание завершения предыдущих команд
-    lnh_sync(); 
-    //Объявление переменных
-    unsigned int count = lnh_get_num(TEST_STRUCTURE);
-    unsigned int size_in_bytes = 2*count*sizeof(uint64_t);
-    //Создание буфера для приема пакета
-    uint64_t *buffer = (uint64_t*)malloc(size_in_bytes);
-    //Выборка минимального ключа
-    lnh_get_first(TEST_STRUCTURE);
-    //Запись ключа и значения в буфер
-    for (int i=0; i<count; i++) {
-        buffer[2*i] = lnh_core.result.key;
-        buffer[2*i+1] = lnh_core.result.value;
-        lnh_next(TEST_STRUCTURE,lnh_core.result.key);
-    }
-    //Запись глобальной памяти из RAM
-    buf_write(size_in_bytes, (char*)buffer);   
-    mq_send(count);
-    free(buffer);
+                //Вариант 1 - обход записей пользователя явным образом
+                auto crole = USERS.nsm(users::key{.idx=users::idx_min,.user=quser});
+                while (crole && crole.key().user==quser) {
+                        if (crole.value().time>qtime) mq_send(crole.value());  
+                        crole = USERS.nsm(crole.key());
+                } 
 
+                //Вариант 2 - использование итератора
+                for (users::val val : role_range(USERS,quser)) {
+                        if (val.time>qtime) mq_send(val);
+                }
+                mq_send_flush(-1ull);
+        } 
 }
-
 ```
 
 ## 3.2. Подключение к удаленному серверу 
@@ -2189,7 +2253,7 @@ _Визуализация графа_ — это графическое пред
 
 В зависимости от выполняемых в алгоритме действий возможно использование как одного варианта представления, так и одновременно несколько вариантов.
 
-## 4.3. Использование библиотеки шаблонов leonhard-x64-xrt-v2 для обработки графов
+## 4.3. Использование библиотеки шаблонов для обработки графов
 
 Для реализация алгоритмов обработки графов необходимо представить операции над множествами (в том числе, множествами вершин и ребер графа) в виде набора команд дискретной математики DISC. Все команды обработки структур данных изменяют регистр статуса, по которому можно определить, было ли выполнение команды успешным (<a href="#2_6_1" target="_blank">Регистр LNH_STATE</a>, бит SPU_ERROR_FLAG). Результаты, влияющие на работу программы, должны быть учтены в общем алгоритме. После завершения основания команд, основанных на поиске (SEARCH, DELETE, MAX, MIN, NEXT, PREV, NSM, NGR) в очередь данных попадают ключ и значение найденных записей (KEY, VALUE), которые могут быть использованы в алгоритме программного ядра CPE riscv32. Для команд И-ИЛИ-НЕ (пересечение,объединение,дополнение) передаются операнды номеров структур (R,A,B). Операнд R указывает на номер структуры, в которой будет сохранен результат. Структуры A и B используются в И-ИЛИ-НЕ операциях и срезах в качестве исходных.
 
@@ -2917,8 +2981,6 @@ struct Graph {
 
 Далее рассмотрим код, реализующий алгоритм Дейкстры в программном ядре CPE.
 
-<!--
-
 ```c
  void dijkstra() {
 	//получить начальную вершину графа из MQ
@@ -3147,7 +3209,7 @@ G1.ins_async(Graph::Path_key{.u = start_virtex}, Graph::Shortest_path{.du = 0, .
 
 Для многих сетевых структур необходимо определить относительную важность входящих в нее узлов. Например, загруженность узла связи в компьютерной сети определяется как суммарное число кратчайших путей между всеми остальными узлами, которые проходят через узел *i*:
 
-<img src="https://latex.codecogs.com/svg.image?B(i)&space;=\sum_{s,t}^{}\frac{\sigma_{s,t}(i)}{\sigma_{s,t}}">
+<img src="https://latex.codecogs.com/svg.image?B(i)&space;=\sum_{s,t}^{}\frac{\sigma_{s,t}(i)}{\sigma_{s,t}}" width="50%">
 
 где:
 
@@ -3305,7 +3367,7 @@ void btwc () {
 
 Для оценки целесообразности объединения вершин в сообщества используется числовая характеристика, которая описывает выраженность структуры сообществ в данном графе, и называемая модулярностью:
 
-<img src="https://latex.codecogs.com/svg.image?Q=\frac{1}{2m}\sum_{i,j}^{}\left(A_{ij}-\frac{d_id_j}{2m}\right)\delta(C_i,C_j)">
+<img src="https://latex.codecogs.com/svg.image?Q=\frac{1}{2m}\sum_{i,j}^{}\left(A_{ij}-\frac{d_id_j}{2m}\right)\delta(C_i,C_j)" width="50%">
 
 где δ(Ci, Cj) — дельта-функция, равная единице, если Ci = Cj и нулю иначе.
 
@@ -3378,7 +3440,7 @@ void btwc () {
 
 Раскладка графа приближается к оптимальной по мере уменьшения энергии пружинной системы. К узлам, соединенным пружиной, приложена сила притяжения (fa), а к разъединенным узлам приложена сила отталкивания (fr). Эти силы определяются следующим образом:
 
-<img src="https://latex.codecogs.com/svg.image?f_a(d)=k_a\times&space;log(d);f_r(d)=\frac{k_r}{d^2}">
+<img src="https://latex.codecogs.com/svg.image?f_a(d)=k_a\times&space;log(d);f_r(d)=\frac{k_r}{d^2}" width="50%">
 
 ka и kr — константы, а d — текущее расстояние между узлами. Для соединенных узлов это расстояние d является длиной пружины. Начальная компоновка графа настраивается случайным образом. В каждой итерации силы рассчитываются для каждого узла, и узлы соответственно перемещаются, чтобы уменьшить напряжение. Однако модель Spring-Embedder может не работать на очень больших графах.
 
@@ -3396,25 +3458,25 @@ ka и kr — константы, а d — текущее расстояние м
 
 Для динамической системы из n частиц, соединенных между собой пружинами, пусть p1, p2 ... pn будут частицами в области поля визуализации, соответствующими вершинам v1, v2 ... vn V графа соответственно. Сбалансированное расположение вершин может быть достигнуто с помощью динамически сбалансированной пружинной системы. Камада и Каваи сформулировали степень дисбаланса как общую энергию пружин:
 
-<img src="https://latex.codecogs.com/svg.image?E=\sum_{i=1}^{n-1}\sum_{j=i&plus;1}^{n}\frac{1}{2}(|p_i-p_j|-l_{ij})^2">
+<img src="https://latex.codecogs.com/svg.image?E=\sum_{i=1}^{n-1}\sum_{j=i&plus;1}^{n}\frac{1}{2}(|p_i-p_j|-l_{ij})^2" width="50%">
 
 Данная модель подразумевает, что наилучшее расположение графа — это состояние с минимальным значением E. Расстояние d<sub>ij</sub> между двумя вершинами v<sub>i</sub> и v<sub>j</sub> в графе определяется как длина кратчайшего пути между v<sub>i</sub> и v<sub>j</sub>. Алгоритм направлен на согласование длины пружины l<sub>ij</sub> между частицами p<sub>i</sub> и p<sub>j</sub> с кратчайшим расстоянием пути, чтобы достичь оптимальной длины между ними на чертеже. Длина l<sub>ij</sub> определяется следующим образом:
 
-<img src="https://latex.codecogs.com/svg.image?l_{ij}=L\times&space;d_{ij}">
+<img src="https://latex.codecogs.com/svg.image?l_{ij}=L\times&space;d_{ij}"width="50%" >
 
 где L — желаемая длина одного ребра в области рисования. L можно определить на основе наибольшего расстояния между вершинами в графе. Если L<sub>0</sub> — длина стороны квадрата области рисования, L можно получить следующим образом:
 
-<img src="https://latex.codecogs.com/svg.image?L=\frac{Lo}{max_{i<j}(d_{ij})}">
+<img src="https://latex.codecogs.com/svg.image?L=\frac{Lo}{max_{i<j}(d_{ij})}" width="50%">
 
 Сила пружины, соединяющей p<sub>i</sub> и p<sub>j</sub>, обозначается параметром k<sub>ij</sub>:
 
-<img src="https://latex.codecogs.com/svg.image?k_{ij}=K/d_{ij}^2">
+<img src="https://latex.codecogs.com/svg.image?k_{ij}=K/d_{ij}^2" width="50%">
 
 Затем алгоритм ищет визуальное положение для каждого узла v в топологии сети и пытается уменьшить функцию энергии во всей сети. То есть алгоритм вычисляет частные производные для всех узлов топологии сети с точки зрения каждого x<sub>v</sub> и y<sub>v</sub>, которые равны нулю (т.е. ∂E / ∂x<sub>v</sub> = ∂E / ∂y<sub>v</sub> = 0; 1 < v < n).
 
 Однако эти нелинейные уравнения зависимы, поэтому для решения задачи можно использовать итерационный подход, основанный на методе Ньютона-Рафсона. На каждой итерации алгоритм выбирает узел m с наибольшим максимальным изменением (Δm). Другими словами, узел m перемещается в новое положение, где он может достичь более низкого уровня Δm, чем раньше. Между тем, другие узлы остаются фиксированными. Максимальное изменение (Δm) рассчитывается следующим образом:
 
-<img src="https://latex.codecogs.com/svg.image?\Delta&space;m=\sqrt{\left(\frac{\partial&space;E}{\partial&space;x_m}\right)^2&plus;\left(\frac{\partial&space;E}{\partial&space;y_m}\right)^2}">
+<img src="https://latex.codecogs.com/svg.image?\Delta&space;m=\sqrt{\left(\frac{\partial&space;E}{\partial&space;x_m}\right)^2&plus;\left(\frac{\partial&space;E}{\partial&space;y_m}\right)^2}" width="50%">
 
 #### 4.4.4.3. Force-Directed Placement 
 
@@ -3422,7 +3484,7 @@ ka и kr — константы, а d — текущее расстояние м
 
 Сила притяжения (fa) и сила отталкивания (fr) определяются следующим образом:
 
-<img src="https://latex.codecogs.com/svg.image?f_a(d)=\frac{d^2}{k};f_r(d)=-\frac{k^2}{d}">
+<img src="https://latex.codecogs.com/svg.image?f_a(d)=\frac{d^2}{k};f_r(d)=-\frac{k^2}{d}" width="50%">
 
 где d — расстояние между двумя узлами, а k — константа идеального попарного расстояния. Константа идеального расстояния k = √(area / n). Здесь area — область рамки чертежа, n — общее количество узлов в топологии сети.
 
@@ -3440,550 +3502,12 @@ _Раскладка графа Force-directed layout - Fruchterman - Reingold_
 
 ## 4.5. Сборка и запуск проекта 
 
-После подключения к серверу по протоколу ssh необходимо клонировать репозиторий git с кодом примера. Для этого выполните команду:
-
-```sh
-git clone --recursive https://gitlab.com/leonhard-x64-xrt-v2/btwc-example/btwc-dijkstra-xrt.git
-```
-
-Для сборки проекта перейдите в директорию disc-example и выполните команду make:
-
-```sh
-cd btwc-dijkstra-xrt
-make
-```
-
-Результатом выполнения команды станет файлы host_main, sw_kernel_main.rawbinary и leonhard_2cores_267mhz.xclbin в директории проекта верхнего уровня.
-
-Для запуска проекта выполните команду
-
-```sh
-./host/host_main leonhard_2cores_267mhz.xclbin ./sw-kernel/sw_kernel.rawbinary
-```
-
-Для выбора варианта раскладки графа необходимо указать в файле ./host/src/host_main.cpp один из вариантов:
-
-- Разсладка сообществ с помощью иерархического объединения и укладки в боксы:
-```
-#define BOX_LAYOUT
-//#define FORCED_LAYOUT
-```
-
-или
-
-- Раскладка сообществ с помощью силового алгоритма Фрухтермана-Рейнгольда:
-
-```
-//#define BOX_LAYOUT
-#define FORCED_LAYOUT
-```
-
-
-
-> Если устройство занято другим проектом, вы можете сбросить его командой ```xbutil reset```!
-
-![Отказ запуска при блокировке карты](assets/card_deadlocked.jpg)
-**Отказ запуска при блокировке карты**
-
-> Если устройство не было разблокировано, это означает, что один из пользователей не остановил процесс отладки по ```dgb```. Вы можете остановить все отладчики в системе и сбросить карту командой ```sudo /opt/xilinx/overlaybins/reset.sh``` (даже несмотря на то, что вы не являетесь членом группы sudoers!!!)
-
-
-После запуска проекта host будет открыт WebSocket на порту 0x4747. 
-
-```bash
-Group #0 	Core #0
-	Software Kernel Version:	0x0000001a
-	Leonhard Status Register:	0x00300001_09110611
-
-DISC system speed test v3.0
-Start at local date: 02.10.2022.; local time: 13.36.03
-
-Test                                                             value          units
--------------------------------------------------------------------------------------
-Graph Processing Cores count (GPCC)                                  1      instances
--------------------------------------------------------------------------------------
-Leonhard clock frequency (LNH_CF)                                  240            MHz
--------------------------------------------------------------------------------------
-Data graph created!
-
-BTWC is done for 0.00 seconds
-Create visualisation
-I этап: инициализация временных структур
-Количество сообществ в очереди 3580 и в структуре сообществ 213
-Количество вершин в графе 213
-II этап: выделение сообществ
-III этап: построение дерева сообществ
-IV этап: выделение прямоугольных областей
-V этап: определение координат вершин
-Wait for connections
-```
-Далее можно запустить сервер **bokeh**, выполняющий визуализацию графа. Для этого испольщуем команды менеджера консольных окон screen:
-
-* Ctrl-a + c: создает новые окна.
-* Ctrl-a + w: отображает список всех открытых в данный момент окон.
-* Ctrl-a + A: переименовать текущие окна. Имя появится, когда вы перечислите список окон, открытых с помощью Ctrl-a + w.
-* Ctrl-a + n: Переход к следующим окнам.
-* Ctrl-a + p: Переход к предыдущим окнам.
-* Ctrl-a + Ctrl-a: Возврат к последнему использовавшемуся окну.
-* Ctrl-a + k: закрыть текущие окна (убить).
-* Ctrl-a + S: разделяет текущие окна по горизонтали. Чтобы переключаться между окнами, сделайте Ctrl-a + Tab.
-* Ctrl-a + |: разделяет текущие окна по вертикали.
-* Ctrl-a + X: закрыть активное разделенное окно.
-* Ctrl-a + Q: закрыть все разделенные окна.
-* Ctrl-a + d: Отключить сеанс экрана, не останавливая его.
-* Ctrl-a + r: повторное подключение отсоединенного сеанса экрана.
-* Ctrl-a + [: Запускает режим копирования.
-* Ctrl-a +]: вставляет скопированный текст.
-
-Создадим новую консольную сессию окна: ```Ctrl-a + c```
-
-Далее запустим сервер bokeh:
-
-```bash
-cd <Путь к проекту btwc-example>
-cd bokeh
-./start_33000.sh btwc.py
-```
-
-В итоге будет получена ссылка на визуализацию случайного графа:
-
-```
-Starting Bokeh server version 2.4.3 (running on Tornado 6.1)
-User authentication hooks NOT provided (default user enabled)
-Bokeh app running at: http://195.19.32.95:33000/btwc
-Starting Bokeh server with process id: 65483
-
-```
-
-Если копия сервера уже запущена на данном порту 33000, то вы можете указать в файле start_33000.sh другой свобобный порт.
-
-```
-Starting Bokeh server version 2.4.3 (running on Tornado 6.1)
-Cannot start Bokeh server, port 33000 is already in use
-```
-
-Укажем порт 33001 и перезапустим сервер:
-
-```
-./start_33000.sh btwc.py
-```
-В результате по указанной ссылке будет визуализирован случайный граф:
-
-
-![](assets/Fig7.jpg)
-**Результат визуализации графа с использование Центральности, Выделения сообществ и раскладки с помощью алгоритма гельотинного деления**
-
 
 
 ## 4.6. Индивидуальные задания 
 
-**Выполнить визуализацию неориентированного графа, представленного в формате tsv. Каждая строчка файла представляет собой описание ребра, сотоящее из трех чисел (Вершина,Вершина,Вес) или двух чисел (Вершина,Вершина). Во втором случае вес ребра принимается равным 1.** 
-
----
-
-**Вариант 1** 
-
-**Визуализация графа**: <a href="https://raw.githubusercontent.com/alexbmstu/2022/main/data/kronecker_var01.tsv" target="_blank">Файл данных kronecker_var01</a>
-
----
-
-**Вариант 2** 
-
-**Визуализация графа**: <a href="https://raw.githubusercontent.com/alexbmstu/2022/main/data/kronecker_var02.tsv" target="_blank">Файл данных kronecker_var02</a>
-
----
-
-**Вариант 3** 
-
-**Визуализация графа**: <a href="https://raw.githubusercontent.com/alexbmstu/2022/main/data/kronecker_var03.tsv" target="_blank">Файл данных kronecker_var03</a>
-
----
-
-**Вариант 4** 
-
-**Визуализация графа**: <a href="https://raw.githubusercontent.com/alexbmstu/2022/main/data/kronecker_var04.tsv" target="_blank">Файл данных kronecker_var04</a>
-
----
-
-**Вариант 5** 
-
-**Визуализация графа**: <a href="https://raw.githubusercontent.com/alexbmstu/2022/main/data/kronecker_var05.tsv" target="_blank">Файл данных kronecker_var05</a>
-
----
-
-**Вариант 6** 
-
-**Визуализация графа**: <a href="https://raw.githubusercontent.com/alexbmstu/2022/main/data/kronecker_var06.tsv" target="_blank">Файл данных kronecker_var06</a>
-
----
-
-**Вариант 7** 
-
-**Визуализация графа**: <a href="https://raw.githubusercontent.com/alexbmstu/2022/main/data/kronecker_var07.tsv" target="_blank">Файл данных kronecker_var07</a>
-
----
-
-**Вариант 8** 
-
-**Визуализация графа**: <a href="https://raw.githubusercontent.com/alexbmstu/2022/main/data/kronecker_var08.tsv" target="_blank">Файл данных kronecker_var08</a>
-
----
-
-**Вариант 9** 
-
-**Визуализация графа**: <a href="https://raw.githubusercontent.com/alexbmstu/2022/main/data/simulated_blockmodel_graph_500_nodes.tsv" target="_blank">Файл данных simulated_blockmodel_graph_500_nodes</a>
-
----
-
-**Вариант 10** 
-
-**Визуализация графа**: <a href="https://raw.githubusercontent.com/alexbmstu/2022/main/data/simulated_blockmodel_graph_500_nodes_snowball_1.tsv" target="_blank">Файл данных simulated_blockmodel_graph_500_nodes_snowball_1</a>
-
----
-
-**Вариант 11** 
-
-**Визуализация графа**: <a href="https://raw.githubusercontent.com/alexbmstu/2022/main/data/simulated_blockmodel_graph_500_nodes_snowball_2.tsv" target="_blank">Файл данных simulated_blockmodel_graph_500_nodes_snowball_2</a>
-
----
-
-**Вариант 12** 
-
-**Визуализация графа**: <a href="https://raw.githubusercontent.com/alexbmstu/2022/main/data/simulated_blockmodel_graph_500_nodes_snowball_3.tsv" target="_blank">Файл данных simulated_blockmodel_graph_500_nodes_snowball_3</a>
-
----
-
-**Вариант 13** 
-
-**Визуализация графа**: <a href="https://raw.githubusercontent.com/alexbmstu/2022/main/data/simulated_blockmodel_graph_500_nodes_snowball_4.tsv" target="_blank">Файл данных simulated_blockmodel_graph_500_nodes_snowball_4</a>
-
----
-
-**Вариант 14** 
-
-**Визуализация графа**: <a href="https://raw.githubusercontent.com/alexbmstu/2022/main/data/simulated_blockmodel_graph_500_nodes_snowball_5.tsv" target="_blank">Файл данных simulated_blockmodel_graph_500_nodes_snowball_5</a>
-
----
-
-**Вариант 15** 
-
-**Визуализация графа**: <a href="https://raw.githubusercontent.com/alexbmstu/2022/main/data/simulated_blockmodel_graph_500_nodes_snowball_6.tsv" target="_blank">Файл данных simulated_blockmodel_graph_500_nodes_snowball_6</a>
-
----
-
-**Вариант 16** 
-
-**Визуализация графа**: <a href="https://raw.githubusercontent.com/alexbmstu/2022/main/data/simulated_blockmodel_graph_500_nodes_snowball_7.tsv" target="_blank">Файл данных simulated_blockmodel_graph_500_nodes_snowball_7</a>
-
----
-
-**Вариант 17** 
-
-**Визуализация графа**: <a href="https://raw.githubusercontent.com/alexbmstu/2022/main/data/simulated_blockmodel_graph_500_nodes_snowball_8.tsv" target="_blank">Файл данных simulated_blockmodel_graph_500_nodes_snowball_8</a>
-
----
-
-**Вариант 18** 
-
-**Визуализация графа**: <a href="https://raw.githubusercontent.com/alexbmstu/2022/main/data/simulated_blockmodel_graph_500_nodes_snowball_9.tsv" target="_blank">Файл данных simulated_blockmodel_graph_500_nodes_snowball_9</a>
-
----
-
-**Вариант 19** 
-
-**Визуализация графа**: <a href="https://raw.githubusercontent.com/alexbmstu/2022/main/data/simulated_blockmodel_graph_500_nodes_snowball_10.tsv" target="_blank">Файл данных simulated_blockmodel_graph_500_nodes_snowball_10</a>
-
----
-
-**Вариант 20** 
-
-**Визуализация графа**: <a href="https://raw.githubusercontent.com/alexbmstu/2022/main/data/simulated_blockmodel_graph_1000_nodes.tsv" target="_blank">Файл данных simulated_blockmodel_graph_1000_nodes</a>
-
----
-
-**Вариант 21** 
-
-**Визуализация графа**: <a href="https://raw.githubusercontent.com/alexbmstu/2022/main/data/simulated_blockmodel_graph_1000_nodes_snowball_1.tsv" target="_blank">Файл данных simulated_blockmodel_graph_1000_nodes_snowball_1</a>
-
----
-
-**Вариант 22** 
-
-**Визуализация графа**: <a href="https://raw.githubusercontent.com/alexbmstu/2022/main/data/simulated_blockmodel_graph_1000_nodes_snowball_2.tsv" target="_blank">Файл данных simulated_blockmodel_graph_1000_nodes_snowball_2</a>
-
----
-
-**Вариант 23** 
-
-**Визуализация графа**: <a href="https://raw.githubusercontent.com/alexbmstu/2022/main/data/simulated_blockmodel_graph_1000_nodes_snowball_3.tsv" target="_blank">Файл данных simulated_blockmodel_graph_1000_nodes_snowball_3</a>
-
----
-
-**Вариант 24** 
-
-**Визуализация графа**: <a href="https://raw.githubusercontent.com/alexbmstu/2022/main/data/simulated_blockmodel_graph_1000_nodes_snowball_4.tsv" target="_blank">Файл данных simulated_blockmodel_graph_1000_nodes_snowball_4</a>
-
----
-
-**Вариант 25** 
-
-**Визуализация графа**: <a href="https://raw.githubusercontent.com/alexbmstu/2022/main/data/simulated_blockmodel_graph_1000_nodes_snowball_5.tsv" target="_blank">Файл данных simulated_blockmodel_graph_1000_nodes_snowball_5</a>
-
----
-
-**Вариант 26** 
-
-**Визуализация графа**: <a href="https://raw.githubusercontent.com/alexbmstu/2022/main/data/simulated_blockmodel_graph_1000_nodes_snowball_6.tsv" target="_blank">Файл данных simulated_blockmodel_graph_1000_nodes_snowball_6</a>
-
----
-
-**Вариант 27** 
-
-**Визуализация графа**: <a href="https://raw.githubusercontent.com/alexbmstu/2022/main/data/simulated_blockmodel_graph_1000_nodes_snowball_7.tsv" target="_blank">Файл данных simulated_blockmodel_graph_1000_nodes_snowball_7</a>
-
----
-
-**Вариант 28** 
-
-**Визуализация графа**: <a href="https://raw.githubusercontent.com/alexbmstu/2022/main/data/simulated_blockmodel_graph_1000_nodes_snowball_8.tsv" target="_blank">Файл данных simulated_blockmodel_graph_1000_nodes_snowball_8</a>
-
----
-
-**Вариант 29** 
-
-**Визуализация графа**: <a href="https://raw.githubusercontent.com/alexbmstu/2022/main/data/simulated_blockmodel_graph_1000_nodes_snowball_9.tsv" target="_blank">Файл данных simulated_blockmodel_graph_1000_nodes_snowball_9</a>
-
----
-
-**Вариант 30** 
-
-**Визуализация графа**: <a href="https://raw.githubusercontent.com/alexbmstu/2022/main/data/simulated_blockmodel_graph_1000_nodes_snowball_10.tsv" target="_blank">Файл данных simulated_blockmodel_graph_1000_nodes_snowball_10</a>
-
----
-
-**Вариант 31** 
-
-**Визуализация графа**: <a href="https://raw.githubusercontent.com/alexbmstu/2022/main/data/static_highOverlap_highBlockSizeVar_1000_nodes.tsv" target="_blank">Файл данных static_highOverlap_highBlockSizeVar_1000_nodes</a>
-
----
-
-**Вариант 32** 
-
-**Визуализация графа**: <a href="https://raw.githubusercontent.com/alexbmstu/2022/main/data/static_highOverlap_lowBlockSizeVar_1000_nodes.tsv" target="_blank">Файл данных static_highOverlap_lowBlockSizeVar_1000_nodes</a>
-
----
-
-**Вариант 33** 
-
-**Визуализация графа**: <a href="https://raw.githubusercontent.com/alexbmstu/2022/main/data/static_lowOverlap_highBlockSizeVar_1000_nodes.tsv" target="_blank">Файл данных static_lowOverlap_highBlockSizeVar_1000_nodes</a>
-
----
-
-**Вариант 34** 
-
-**Визуализация графа**: <a href="https://raw.githubusercontent.com/alexbmstu/2022/main/data/static_lowOverlap_lowBlockSizeVar_1000_nodes.tsv" target="_blank">Файл данных static_lowOverlap_lowBlockSizeVar_1000_nodes</a>
 
 ---
 
 # **5. Командный практикум. Обработка и визуализация графов в вычислительном комплексе Тераграф** 
-
-## 5.1. Пример визуализации корреляционной матрицы в виде графа
-
-Зрительная система человека способна естественным образом обрабатывать многомерную информацию. Например, человек можем обнаружить закономерности на диаграмме рассеяния, приводящие его к выдвижению различных гипотез,  в то время как эти же закономерности невидимы, когда данные представлены в виде матрицы.
-
-Матрица корреляции может быть представлена в виде графа, в котором каждая переменная является узлом, а каждая корреляция — ребром. Изменяя отсекающую оценку для ребер в соответствии с величиной корреляции, можно визуализировать структуру матрицы корреляции, наглядно демонстрируя возникающие связанные подмножества переменных. Таким образом можно представить широкий спектр матриц, используемых в статистике, для наглядного представления ковариаций, результатов факторного анализа, регрессии и т.д..
-
-Пример представления корреляционной матрицы вы можете найти в следующей блокноте: [Пример блокнота Jupyter Notebook в Google Colab](https://colab.research.google.com/drive/1g_ZvedWJzA4sqWRC5zR1q2hoheCzS4Oh?usp=sharing)
-
-Представленная в примере предметная область позволяет оценить биологический возраст человека по серии измерений (частота сердечных сокращений, частота дыхания, длительность нахождения в позе Ромберга и т.д.). Полученный граф позволяет быстро обнаружить аномалии в измеренных параметрах и наглядно представить их. Пояснения терминологии, используемой при анализе биологического возраста, вы можете найти в [файле глоссария](docs/bioage_glossary.pdf).
-
-> Граф знаний, представляющий корреляционную матрицу на основе отсекающей оценки коэффициента корреляции, может быть использован для анализа физиологического состояния человека 
-
-Для анализа результатов полезно представить корреляционную матрицу: 
-
-![](assets/corr_matrix.png)
-
-Далее может быть задана отсекающая оценка коэффициента корреляции (например, на основе p-значения или уровня значимости alpha, или используя экспертную оценку для визуализации требуемого порога корреляции).
-
-В итоге получаем графы, демонстрирующие матрицу корреляции в наглядной форме:
-
-![](assets/bioage_graph.png)
-
-
-## 5.2. Задание практикума 
-
-Необходимо предложить варианты применения графов для решения важных задач. Для выбранной задачи необходимо найти примеры исходных данных и визуализировать их в виде графа. Для визуализации могут быть использованы любые из перечисленных ресурсов:
-
-* Вычислительный комплекс Тераграф.  
-
-* Скрипты python в виде ноутбуков в локальном или облачном варианте ([Kaggle](https://www.kaggle.com/),[Google Colab](https://colab.research.google.com/) и др.).
-
-* Средства визуализации графов в локальном или облачном варианте [](https://neo4j.com/graph-visualization-neo4j/) 
-
-В результате практикума команда должна представить краткое описание идеи (тема, актуальность, краткое описание) и визуализацию данных в виде изображения с высоким разрешением. 
-
-Изображение будет распечатано организаторами конкурса и будет представлять проект на защите.
-
-
-
-
-
-# **Конкурсные работы**
-
-
-## Граф решетки 
-
-![Граф решетки](assets/0.jpg)
-
-Изображен граф решетки. Цвет и размер вершин определяется их центральностью
-
-## Гипотеза_Колатца
-
-![гипотеза_Колатца](assets/1.jpg)
-
-Гипотеза Коллатца (3n+1 дилемма, сиракузская проблема) — одна из нерешённых проблем математики. Показан граф, демонстрирующий последовательности первых 2000 чисел.
-
-## Сообщества патентных классов
-
-![Сообщества патентных классов](assets/2.jpg)
-
-
-Изолированные графы - это крайне слабо связанные группы («надсообщества») патентных классов, ребра между которыми были отфильтрованы как шум. Цвет вершины - выражает принадлежность патентного класса к выделенному сообществу. Размер вершины - количество патентов в данном классе. Цвет (степень красноты) ребра - его вес.
-
-## Вагапоиды
-
-![Вагапоиды](assets/3.jpg)
-
-
-Размер узла (а также его цвет от желтого до красного) - это количество связей у этого человека (красный - разговаривает/дружит/ссорится со многими, желтый - что то типа новичка в коллективе или интроверт). Размер дуги (а так же изменение цвета от светлого до темного серого) - это ""вес отношений"". Чем толще(темнее), тем более дружественные отношения."
-
-## Звезда Смерти
-
-![Звезда Смерти](assets/4.jpg)
-
-На изображении показана модель данных, представляющая собой туристические поездки россиян в 2022 году. Одинаковые атрибуты различных поездок позволяют связать их в граф. В центрах сообществ находятся наиболее типичные варианты путешествий. 
-
-## Новогодний лес Левенштейна
-
-![Новогодний лес Левенштейна](assets/5.jpg)
-
-
-На картине изображены новогодние ели, на ветках которых размещены новогодние игрушки - шары. Каждый шар - это слово, а расстояние между словами - расстояние Левенштейна. Было использовано 7 основных слов (по одному на члена команды), для которых искали однокоренные и считали расстояния между всеми парами. Итоговая картинка получена путем связывания ребрами каждой пары основных слов. 
-
-## Структура модели личности человека
-
-![Структура модели личности человека](assets/6.jpg)
-
-Проанализирована структура личностного теста, основанного на Пятифакторной модели личности. Каждый цвет на графе отвечает за один из факторов: 1) Зеленый - Экстраверсия (общительный/энергичный); 2) Желтый - Открытость опыту (изобретательный/любопытный); 3) Синий  - Добросовестность / сознательность (рациональный/организованный); 4) Оранжевый - Доброжелательность  (дружелюбный/эмпатичный); 5) Розовый - Эмоциональная стабильность (стойкий/уверенный в себе). Каждая вершина графа соответствует конкретной черте характера, которая относится к соответствующему фактору модели. Чем четче показано ребро – тем больше коэффициент корреляции между чертами.  Графы расположены по возрастанию порога коэффициента корреляции. 
-
-## История развития вселенной
-
-![История развития вселенной](assets/7.jpg)
-
-Вершинами в данном графе являются популярные Youtube каналы по запросу "котики". При запросе в Youtube осуществляется поиск видео по запросу, а затем похожих видео. На основании этого между Youtube каналами ребра отображают наличие похожих видео.
-
-## Денежные транзакции
-
-![Денежные транзакции](assets/8.jpg)
-
-
-Цвет определяет степень подозрения аккаунта в мошенничестве: красные вершины - мошеннические аккаунты; cиние вершины - посреднические мошеннические аккаунты для заметания следов.
-
-## Граф соавторства научных публикаций
-
-![Граф соавторства научных публикаций](assets/9.jpg)
-
-
-Вершины представляют автора, связи - наличие соавторства между авторами. Чем больше по размеру вершина, тем больше публикаций у автора, чем толще связь, тем больше публикаций у данных двух авторов в соавторстве. В центре помещена вершина, представляющая российского ученого в области компьютерных наук Сергея Левина. Подписанные вершины - это недавние авторы, с которыми данный ученый опубликовал работу в соавторстве.
-
-## Вселенная адаптационного синдрома Ганса Селье
-
-![Вселенная адаптационного синдрома Ганса Селье](assets/10.jpg)
-
-
-Графы представляют матрицу корреляции физиологических параметров группы людей с различной отсекающей оценкой корреляционной связи. Графы наглядно демонстрируют особенности организма, впервые выявленные Гансом Селье.
-
-## Kloube la romantique
-
-![Kloube la romantique](assets/11.jpg)
-
-На картине изображен граф визуализации возможных исходов в диалоге. Цветом выделены 3 основные группы выборов: зеленые – не влияющие на исход выборы, красные – выборы сделанные по агрессивной модели поведения, синие – выборы сделанные по дипломатичной модели поведения. Толщина линий означает цену, которую пользователь заплатит за определенный выбор.
-
-## Сцена охоты коронавируса
-
-![Сцена охоты коронавируса](assets/12.jpg)
-
-
-Менее чем за 20 лет в человеческой популяции появились три смертельных коронавируса: SARS-CoV, MERS-CoV и SARS-CoV-2, что привело к гибели от сотен до сотен тысяч человек. Другие коронавирусы вызывают эпизоотии, представляющие значительную угрозу как для домашних, так и для диких животных. Члены этого вирусного семейства имеют самый длинный геном из всех РНК-вирусов и экспрессируют до 29 белков, устанавливающих сложные взаимодействия с протеомом хозяина. Расшифровка этих взаимодействий необходима для выявления клеточных путей, захваченных этими вирусами, для репликации и ухода от врожденного иммунитета. Взаимодействия вирус-хозяин также предоставляют ключевую информацию для выбора целей для разработки противовирусных препаратов. Здесь мы визуализируем набор данных о белок-белковых взаимодействиях коронавирус-хозяин. В визуализации применен метод (кластеризация) Лувена  - это метод извлечения сообществ из больших сетей. Метод может находить кластера произвольной формы и избегать воздействий шумов.
-
-## Температура финансового рынка
-
-![Температура финансового рынка](assets/13.jpg)
-
-Цвет - температура (горячо/холодно), вершина - температура в какой-то день года, две вершины связаны, если разность цен барреля нефти в соответствующие дни не превышает значения X, где Х - некоторое число. Для 1 графа (Техас) Х = 0,02, то есть 2 цента, для 2 (Сургут) -  0,05.
-
-## Доверие
-
-![Оценка доверия к пользователям](assets/14.jpg)
-
-
-Продемонстрирован граф в котором отображен анализ репутации пользователей на основе оценок выставленных другими пользователями. На графе репутация пользователей отображается при помощи вершин, которые имеют разный цветовой фон - чем темнее фон, тем лучше репутация. Количество ребер для которых исходная вершина является концом, пропорциональны количеству оценок пользователей.
-
-## Звездопад
-
-![Звездопад](assets/15.jpg)
-
-
-На картине изображена сеть сайтов, связанных между собой гиперссылками. Размеры вершин, а также цвета назначаются в соответствии с центральностью вершины.
-
-## Ярославль, социальные связи
-
-![Ярославль, социальные связи](assets/16.jpg)
-
-Кругами обозначены люди, а линиями - знакомства. Чем больше знакомств у человека, тем больше круг, и тем он ближе к розовому оттенку. 
-
-## Солнечный Паттерн
-
-![Солнечный Паттерн](assets/17.jpg)
-
-Изображен граф найденных сообществ на поверхности солнца, объединенные общей интенсивностью свечения. Цвет вершины обозначает, что она является центральной частью области, которая имеет приблизительно равную интенсивность излучения, на поверхности Солнца. Толщина линий означает степень связности двух точек на поверхности звезды между собой. Удаленность сообществ друг от друга примерно аналогична удаленности этих паттернов на поверхности солнца.
-
-## Мы живем в обществе
-
-![Мы живем в обществе](assets/18.jpg)
-
-Для каждого участника сообщества VK МГТУ им. Н.Э.Баумана определяется список сообществ на которые он подписан. При этом связь с общим сообществом игнорируется. Используется дополнительное ограничение на пороговое количество совместных сообществ. Далее применяются алгоритмы кластеризации (алгоритм Лейдена или алгоритм Каргера), чтобы определить, на какие подсообщества разбиты участники. 
-Вершина - конкретный человек, связь - взаимная подписка на одни и те же сообщества, и разбитые с помощью цветов подсообщества.
-
-## Связь между документами
-
-![Связь между документами](assets/19.jpg)
-
-
-Узлами графа являются имена документов. Если какой-то из файлов ссылается на другой, между их именами образуется однонаправленное ребро. Размер узла зависит от количества входящих в него ребер (количества ссылающихся на него файлов), чем больше ребер, тем больше размер узла.
-
-## Одуванчики
-
-![Одуванчики](assets/20.jpg)
-
-На картине изображён результат применения графовой нейронной сети для решения задачи классификации. Вершины одного цвета принадлежат одному кластеру, т. е. образуют сообщество, внешне похожее на одуванчик.
-
-## Colloquium_Cum_Comes
-
-![Colloquium_Cum_Comes](assets/21.jpg)
-
-Вершины расположены по алфавиту, их размер определяется тем, сколько раз они попадаются в более чем 1,5М выборке русских слов. Толщина связей определяется тем, сколько раз был осуществлен переход между этими буквами. Цвет случаен
-
-## Аномалии в отзывах
-
-![Аномалии в отзывах](assets/22.jpg)
-
-
-Предлагается анализировать граф, описывающий отношения между рецензентом, отзывом и рецензируемым объектом (товаром, услугой). Таким образом, граф содержит три типа узлов. Узел рецензента (зелёный) имеет связь с узлом рецензии (красный), узел рецензии — с узлом объекта (синий). Предлагается присваивать рецензентам показатели «степени доверия им», их обзорам — показатель «достоверности», а объектам — показатель «надежности». Все эти показатели взаимосвязаны. Уровень доверия к рецензенту зависит от того, насколько у него достоверные рецензии.  Надежность рецензируемых объектов зависит от степени доверия рецензентам, которые его описывают, а достоверность обзоров зависит от надежности товара, по которым они пишутся, и от доверия их авторам. Величины этих показателей выражены в размерах узлов. Обнаружение аномалий в таком графе может позволить обнаруживать спам-обзоры.
-
-## Универы
-
-![Универы](assets/23.jpg)
-
-Представлены университеты, обладающие атрибутами: уровень рейтинга и количество студентов. Связи образуются при совпадении параметров. По графу можно сделать вывод что в университетах с самыми высокими рейтингами по их странам больше учится небольшое или среднее количество студентов, так как левая и средняя часть более плотная. 
 

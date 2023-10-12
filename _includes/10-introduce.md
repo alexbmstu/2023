@@ -12,7 +12,7 @@ img
 }
 
 /* Create a CSS class to style images to 90% */
-.widePic
+.normalPic
 {
     display:block;
     float:none;
@@ -3173,7 +3173,7 @@ G1.ins_async(Graph::Path_key{.u = start_virtex}, Graph::Shortest_path{.du = 0, .
 
 Для многих сетевых структур необходимо определить относительную важность входящих в нее узлов. Например, загруженность узла связи в компьютерной сети определяется как суммарное число кратчайших путей между всеми остальными узлами, которые проходят через узел *i*:
 
-<img src="https://latex.codecogs.com/svg.image?B(i)&space;=\sum_{s,t}^{}\frac{\sigma_{s,t}(i)}{\sigma_{s,t}}" class="thinPic">
+<img src="https://latex.codecogs.com/svg.image?B(i)&space;=\sum_{s,t}^{}\frac{\sigma_{s,t}(i)}{\sigma_{s,t}}" class="thinPic"/>
 
 где:
 
@@ -3404,7 +3404,7 @@ void btwc () {
 
 Раскладка графа приближается к оптимальной по мере уменьшения энергии пружинной системы. К узлам, соединенным пружиной, приложена сила притяжения (fa), а к разъединенным узлам приложена сила отталкивания (fr). Эти силы определяются следующим образом:
 
-<img src="https://latex.codecogs.com/svg.image?f_a(d)=k_a\times&space;log(d);f_r(d)=\frac{k_r}{d^2}" class="thinPic">
+<img src="https://latex.codecogs.com/svg.image?f_a(d)=k_a\times&space;log(d);f_r(d)=\frac{k_r}{d^2}" class="thinPic"/>
 
 ka и kr — константы, а d — текущее расстояние между узлами. Для соединенных узлов это расстояние d является длиной пружины. Начальная компоновка графа настраивается случайным образом. В каждой итерации силы рассчитываются для каждого узла, и узлы соответственно перемещаются, чтобы уменьшить напряжение. Однако модель Spring-Embedder может не работать на очень больших графах.
 
@@ -3422,25 +3422,25 @@ ka и kr — константы, а d — текущее расстояние м
 
 Для динамической системы из n частиц, соединенных между собой пружинами, пусть p1, p2 ... pn будут частицами в области поля визуализации, соответствующими вершинам v1, v2 ... vn V графа соответственно. Сбалансированное расположение вершин может быть достигнуто с помощью динамически сбалансированной пружинной системы. Камада и Каваи сформулировали степень дисбаланса как общую энергию пружин:
 
-<img src="https://latex.codecogs.com/svg.image?E=\sum_{i=1}^{n-1}\sum_{j=i&plus;1}^{n}\frac{1}{2}(|p_i-p_j|-l_{ij})^2" class="thinPic">
+<img src="https://latex.codecogs.com/svg.image?E=\sum_{i=1}^{n-1}\sum_{j=i&plus;1}^{n}\frac{1}{2}(|p_i-p_j|-l_{ij})^2" class="thinPic"/>
 
 Данная модель подразумевает, что наилучшее расположение графа — это состояние с минимальным значением E. Расстояние d<sub>ij</sub> между двумя вершинами v<sub>i</sub> и v<sub>j</sub> в графе определяется как длина кратчайшего пути между v<sub>i</sub> и v<sub>j</sub>. Алгоритм направлен на согласование длины пружины l<sub>ij</sub> между частицами p<sub>i</sub> и p<sub>j</sub> с кратчайшим расстоянием пути, чтобы достичь оптимальной длины между ними на чертеже. Длина l<sub>ij</sub> определяется следующим образом:
 
-<img src="https://latex.codecogs.com/svg.image?l_{ij}=L\times&space;d_{ij}" class="thinPic" >
+<img src="https://latex.codecogs.com/svg.image?l_{ij}=L\times&space;d_{ij}" class="thinPic"/>
 
 где L — желаемая длина одного ребра в области рисования. L можно определить на основе наибольшего расстояния между вершинами в графе. Если L<sub>0</sub> — длина стороны квадрата области рисования, L можно получить следующим образом:
 
-<img src="https://latex.codecogs.com/svg.image?L=\frac{Lo}{max_{i<j}(d_{ij})}" class="thinPic">
+<img src="https://latex.codecogs.com/svg.image?L=\frac{Lo}{max_{i<j}(d_{ij})}" class="thinPic"/>
 
 Сила пружины, соединяющей p<sub>i</sub> и p<sub>j</sub>, обозначается параметром k<sub>ij</sub>:
 
-<img src="https://latex.codecogs.com/svg.image?k_{ij}=K/d_{ij}^2" class="thinPic">
+<img src="https://latex.codecogs.com/svg.image?k_{ij}=K/d_{ij}^2" class="thinPic"/>
 
 Затем алгоритм ищет визуальное положение для каждого узла v в топологии сети и пытается уменьшить функцию энергии во всей сети. То есть алгоритм вычисляет частные производные для всех узлов топологии сети с точки зрения каждого x<sub>v</sub> и y<sub>v</sub>, которые равны нулю (т.е. ∂E / ∂x<sub>v</sub> = ∂E / ∂y<sub>v</sub> = 0; 1 < v < n).
 
 Однако эти нелинейные уравнения зависимы, поэтому для решения задачи можно использовать итерационный подход, основанный на методе Ньютона-Рафсона. На каждой итерации алгоритм выбирает узел m с наибольшим максимальным изменением (Δm). Другими словами, узел m перемещается в новое положение, где он может достичь более низкого уровня Δm, чем раньше. Между тем, другие узлы остаются фиксированными. Максимальное изменение (Δm) рассчитывается следующим образом:
 
-<img src="https://latex.codecogs.com/svg.image?\Delta&space;m=\sqrt{\left(\frac{\partial&space;E}{\partial&space;x_m}\right)^2&plus;\left(\frac{\partial&space;E}{\partial&space;y_m}\right)^2}" class="thinPic">
+<img src="https://latex.codecogs.com/svg.image?\Delta&space;m=\sqrt{\left(\frac{\partial&space;E}{\partial&space;x_m}\right)^2&plus;\left(\frac{\partial&space;E}{\partial&space;y_m}\right)^2}" class="thinPic"/>
 
 #### 4.4.4.3. Force-Directed Placement 
 
@@ -3448,7 +3448,7 @@ ka и kr — константы, а d — текущее расстояние м
 
 Сила притяжения (fa) и сила отталкивания (fr) определяются следующим образом:
 
-<img src="https://latex.codecogs.com/svg.image?f_a(d)=\frac{d^2}{k};f_r(d)=-\frac{k^2}{d}" class="thinPic">
+<img src="https://latex.codecogs.com/svg.image?f_a(d)=\frac{d^2}{k};f_r(d)=-\frac{k^2}{d}" class="thinPic"/>
 
 где d — расстояние между двумя узлами, а k — константа идеального попарного расстояния. Константа идеального расстояния k = √(area / n). Здесь area — область рамки чертежа, n — общее количество узлов в топологии сети.
 

@@ -9,8 +9,8 @@
 
 **Эксперты**
 
-|   <img src="assets/anastasia_popova.png" class="smallPic">  |   <img src="assets/aleksandra_popova.png" class="smallPic">  |   <img src="assets/892_oooo.plus.png" class="smallPic">  | 
-|  [Попова Анастасия](mailto:anon@anon.ru)<br>*МГК им. П.И.Чайковского* |  [Попова Алекандра](mailto:anon@anon.ru) <br>*RWTH*   |  [Константин Горбунов](mailto:anon@anon.ru)  <br>*НИИ Системной биологии<br>и медицины<br>Роспотребнадзора*   |    
+|   <img src="assets/t_kurokhtin.png" class="smallPic"> |   <img src="assets/anastasia_popova.png" class="smallPic">  |   <img src="assets/aleksandra_popova.png" class="smallPic">  |   <img src="assets/892_oooo.plus.png" class="smallPic">  | 
+|  [Тимофей Курохтин](mailto:anon@anon.ru)<br>*МГТУ им. Н.Э.Баумана* |  [Анастасия Попова](mailto:anon@anon.ru)<br>*МГК им. П.И.Чайковского* |  [Алекандра Попова](mailto:anon@anon.ru) <br>*Высшая школа музыки г.Детмольд; RWTH, г.Аахен, Германия*   |  [Константин Горбунов](mailto:anon@anon.ru)  <br>*НИИ Системной биологии<br>и медицины<br>Роспотребнадзора*   |    
 
 
 

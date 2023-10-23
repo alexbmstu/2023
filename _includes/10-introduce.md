@@ -1687,7 +1687,7 @@ host_main <путь к файлу sw_kernel>
 Например:
 
 ```bash
-host/host_main sw_kernel/sw_kernel_main.rawbinary
+host/host_main sw-kernel/sw_kernel.rawbinary
 ```
 
 Результат работы теста:
@@ -1738,7 +1738,7 @@ host_main <путь к файлу sw_kernel>
 Например:
 
 ```bash
-host/host_main sw_kernel/sw_kernel_main.rawbinary
+host/host_main sw-kernel/sw_kernel.rawbinary
 ```
 
 Далее необходимо ввести запрос (например: ```select role from users where user=5 and time>7200;```) или `exit` для выхода.

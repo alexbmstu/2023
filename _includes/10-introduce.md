@@ -1839,7 +1839,7 @@ make clean
 Для установки требуется рекурсивно клонировать репозиторий:
 
 ```bash
-https://latex.bmstu.ru/gitlab/hackathon2023/lab3.git
+git clone --recursive https://latex.bmstu.ru/gitlab/hackathon2023/lab3.git
 cd lab3
 ```
 

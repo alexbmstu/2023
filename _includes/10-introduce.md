@@ -3854,7 +3854,7 @@ gpc = GPC(device_path=<путь к символьному устройству /
 
 В следующем примере производится инициализация ядра gpc, после чего выполняется тестовая передача и прием массива. Результат сравнивается с ожидаемым:
 
-```Python
+```python
 #Импорт библиотек
 import array
 import pathlib as pth
@@ -3921,7 +3921,7 @@ del(gpc)
 
 Ниже представлен код формирования случайного графа:
 
-```Python
+```python
 #Генерируем случайный связный граф с сообществами
 gpc.start_handler("delete_graph")
 #Создадим несколько собществ
@@ -3942,7 +3942,7 @@ for edge in range(EDGE_COUNT):
 
 Функция insert_edge() выполняет передачу в gpc двух ребер: uv и vu:
 
-```Python
+```python
 #Функция вставки ребра в граф
 def insert_edge(gpci, u, v, w):
     #ребро UV
@@ -3966,7 +3966,7 @@ gpc.start_handler("btwc")
 
 Следующее действие запускает одну из раскладок, выбранных пользователем:
 
-```Python
+```python
 match VISUALIZATION:
     case 1: #Cоздать inbox визуализацию на основе модулярности
         gpc.start_handler("create_communities_forest_vizualization")

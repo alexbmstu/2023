@@ -12,7 +12,7 @@ img
 }
 
 /* Create a CSS class to style images to 90% */
-.normalPic
+.fullPic
 {
     display:block;
     float:none;
@@ -3985,13 +3985,13 @@ match VISUALIZATION:
 После завершения процедуры рендера его результат передается на сервер `bokeh` и выдается на экран.
 
 
-<img src="assets/bokeh_plot_newman.jpg" class="normalPic"/>
+<img src="assets/bokeh_plot_newman.jpg" class="fullPic"/>
 
 {:.image-caption}
 **Рисунок 23 —  Визуализация графа на основе модулярности Ньюмана**
 
 
-<img src="assets/bokeh_plot_fruchterman.jpg" class="normalPic"/>
+<img src="assets/bokeh_plot_fruchterman.jpg" class="fullPic"/>
 
 {:.image-caption}
 **Рисунок 24 — Визуализация на основе силового алгоритма Фрухтерамана-Рейнгольда**
@@ -4035,7 +4035,7 @@ Track 0: Acoustic Guitar
 
 В рассмариваемом примере используется следующий конвейер обработки:
 
-<img src="assets/music_pipeline_st1.png" class="normalPic"/>
+<img src="assets/music_pipeline_st1.png" class="fullPic"/>
 
 {:.image-caption}
 **Рисунок 25 — Конвейер генерации музыки. Этап 1 - создание графов де Брюйна**
@@ -4050,13 +4050,10 @@ Track 0: Acoustic Guitar
 7. Рендер графа передается в хост-подсистему для визуализации. 
 
 
-<img src="assets/tocata_D_moll.jpg" class="normalPic"/>
+<img src="assets/tocata_D_moll.jpg" class="fullPic"/>
 
 {:.image-caption}
 **Рисунок 26 — Выделение сообществ (тем музыкального произведения) и визуализация графа деБрюйна. И.С.Бах, Токата ре-минор BWV565**
-
-![И.С.Бах, Токата ре-минор BWV565](https://e-learning.bmstu.ru/iu6/file.php/1/common_files/hackathon/IMSLP717181-PMLP153090-02.03._Toccata_Und_Fuge_D-moll%2C_BWV_565-_Toccata.mp3){type=audio}
-
 
 С кодом примера можно ознакомиться [тут](https://latex.bmstu.ru/gitlab/hackathon2023/lab6).
 

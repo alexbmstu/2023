@@ -18,7 +18,7 @@ img
     float:none;
     margin-left:auto;
     margin-right:auto;
-    width:90%;
+    width:100%;
 }
 
 /* Create a CSS class to style images to 60% */

@@ -1,6 +1,6 @@
 # url: "" # the base hostname & protocol for your site, e.g. http://example.com
 # baseurl: "" # the subpath of your site, e.g. /blog
-title: "Хакатон-2022" # the name of your site, e.g. ACME Corp.
+title: "Хакатон-2023" # the name of your site, e.g. ACME Corp.
 remote_theme: olivier3lanc/Jekyll-LibDoc
 plugins:
   - jekyll-remote-theme
@@ -129,7 +129,7 @@ prism:
         #- asm6502
         #- autohotkey
         #- autoit
-        #- bash
+        - bash
         #- basic
         #- batch
         #- bbcode
@@ -291,7 +291,7 @@ prism:
         #- pure
         #- purebasic
         #- purescript
-        #- python
+        - python
         #- qsharp
         #- q
         #- qml

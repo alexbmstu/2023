@@ -4066,7 +4066,7 @@ Track 0: Acoustic Guitar
 Для установки требуется рекурсивно клонировать репозиторий:
 
 ```bash
-git clone --recursive https://latex.bmstu.ru/gitlab/hackathon2023/lab4/lab4.git
+git clone --recursive https://latex.bmstu.ru/gitlab/hackathon2023/lab4.git
 cd lab4
 ```
 

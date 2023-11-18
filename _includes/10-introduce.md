@@ -504,7 +504,7 @@ int main(int argc, char** argv)
 ``` 
 
 Для представленного листинга должен быть также создан и скомпилирован ответный код для микропроцессора riscv64im, который будет работать в составе гетерогенного ядра обработки графов.
-В коде должна быть реализована логика установки состояния ядра: одно из двух состояний IDLE или BUSY. Также разработчиком должы быть реализованы обработчики вызываемых из хост-подсистемы функций get_version(), get_lnh_status_high(), get_lnh_status_low(), frequency_measurement().
+В коде должна быть реализована логика установки состояния ядра: одно из двух состояний READY или BUSY. Также разработчиком должы быть реализованы обработчики вызываемых из хост-подсистемы функций get_version(), get_lnh_status_high(), get_lnh_status_low(), frequency_measurement().
 
 Номер обработчика может быть задан явным образом в Xост и sw_kernel частях, однако удобнее использовать механизм автоматической нумерации обработчиков на основе макросов С. Для этого мы будем использовать файл gpc_handkers.h, который должен быть включен как в проект хоста, так и в проект sw_kernel:
 
@@ -549,26 +549,27 @@ volatile unsigned int event_source;
 
 int main(void) {
     /////////////////////////////////////////////////////////
-    //             Основной цикл обработки событий
+    //                  Main Event Loop
     /////////////////////////////////////////////////////////
-    //Инициализация ядра SPE lnh64
+    //Leonhard driver structure should be initialised
     lnh_init();
     for (;;) {
         //Wait for event
         event_source = wait_event();
-        set_gpc_state(BUSY);
         switch(event_source) {
-            /////////////////////////////////////////////////////
-            // Вызов обработчиков, объявленных в gpc_handlers.h
-            /////////////////////////////////////////////////////
+            /////////////////////////////////////////////
+            //  Measure GPN operation frequency
+            /////////////////////////////////////////////
             case __event__(frequency_measurement) : frequency_measurement(); break;
             case __event__(get_lnh_status) : get_lnh_status(); break;
             case __event__(get_version): get_version(); break;
             case __event__(echo_mq): echo_mq(); break;
+
         }
-        set_gpc_state(IDLE);
+        set_gpc_state(READY);
     }
 }
+
     
 //-------------------------------------------------------------
 //      Глобальные переменные

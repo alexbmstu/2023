@@ -4235,6 +4235,8 @@ make clean
 
 Описание стадии 1 подробно представлено в разделе: [Примера 6](https://alexbmstu.github.io/2023/#473-%D0%BF%D1%80%D0%B8%D0%BC%D0%B5%D1%80-6-%D0%B4%D0%B5%D0%BC%D0%BE%D0%BD%D1%81%D1%82%D1%80%D0%B0%D1%86%D0%B8%D1%8F-%D0%B8%D1%81%D0%BF%D0%BE%D0%BB%D1%8C%D0%B7%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D1%8F-%D0%BC%D0%B8%D0%BA%D1%80%D0%BE%D0%BF%D1%80%D0%BE%D1%86%D0%B5%D1%81%D1%81%D0%BE%D1%80%D0%B0-%D0%BB%D0%B5%D0%BE%D0%BD%D0%B0%D1%80%D0%B4-%D1%8D%D0%B9%D0%BB%D0%B5%D1%80-%D0%B4%D0%BB%D1%8F-%D0%B0%D0%BD%D0%B0%D0%BB%D0%B8%D0%B7%D0%B0-%D0%B3%D1%80%D0%B0%D1%84%D0%BE%D0%B2-%D0%B7%D0%BD%D0%B0%D0%BD%D0%B8%D0%B9).
 
+С помощью кода примера 6 можно создавать графы по тому набору композиций, которые  предполагается исопльзвать впоследствии рпи генерации звука. Например, можно собрать этническую музыку, или же музыку опеределенного стиля. Итоговое произведение будет, таким образом, построено исключительно на аккордовых цепочках выбранных произведений.  
+
 ### 5.2.2. Стадия 2. Обход графов де Брюйна 
 
 Для используется следующий конвейер обработки:
@@ -4249,6 +4251,8 @@ make clean
 3. Восстановление аккорда — выборка полной записи о вершине из словаря аккордов, хранимого в GPC  суперЭВМ Тераграф
 4. Запись потока событий — аккорд преобразуется в последовательность событий midi.
 
+В пункте 1 можно указать любую из существующих тональностей (24 шт.). Будут выбраны только те цепочки аккордов, которые были встречены в произведении, написанном в указанной тональности. Последующая обработка выполняется автоматически и настроек не требует.
+
 
 ### 5.2.3. Стадия 3. Стилизация, многоголосие и синтез звука
  
@@ -4262,6 +4266,93 @@ make clean
 3. Объединение midi — стилизованные голоса сводятся вместе
 4. Разделение на голоса — по настройкам пользователя выделяются верхний, нижний голаса, или голоса по заданному диапазону нот. Каждый голос записывается в отдельный канал. 
 5. Синтезатор — для каждого голоса задается soundfont (.sf2) и номер инструмента. Звук генерируется с использованием timidity, далее wav кодируется в mp3 с использованием ffmpeg.
+
+
+На данном этапе погут применять настойки генерации звукового файла, доступные для утилиты timidity. Например, могут быть выдраны звуковые шрифты, и параметры генерации каждого голоса. В приведенном ниже примере конфигурационного файла задается файл со звуковым шрифтом, номер банка и номер инструмента в нем (по терминологии звуковых шрифтов - номера программы). Например, усиление amp задается для каждого голоса в отдельности и позволяет сделать голос громче или тише. Параметр pan определяет смещение голоса относительно центра влево (-100) или вправо (+100) в стерео звучании. Допускаются также параметры left,right,center.
+
+```bash
+#Гитара
+3 %font '/data/hackathon2023/soundfonts/STEEL_STRING_GUITAR.sf2' 0 0 pan=-80 amp=400
+#Хор Ах
+2 %font '/data/hackathon2023/soundfonts/KBH_Real_and_Swell_Choir.sf2' 0 2 pan=-20 amp=40
+#Две виолончели
+1 %font '/data/hackathon2023/soundfonts/Essential Keys-sforzando-v9.6.sf2' 0 29 pan=80 amp=120
+```
+
+Для подбора голосов используется утилита sf2_nfo, доступная на сервере devlab:
+
+```bash
+sf2_nfo '/data/hackathon2023/soundfonts/Essential Keys-sforzando-v9.6.sf2'
+
+fluidsynth: warning: Failed to pin the sample data to RAM; swapping is possible.
+fluidsynth: warning: No preset found on channel 9 [bank=128 prog=0]
+bank: 0 prog: 0 name: Yamaha C5 Grand
+bank: 0 prog: 1 name: Large Concert Grand
+bank: 0 prog: 2 name: Mellow C5 Grand
+bank: 0 prog: 3 name: Bright C5 Grand
+bank: 0 prog: 4 name: Upright Piano
+bank: 0 prog: 5 name: Chateau Grand
+bank: 0 prog: 6 name: Mellow Chateau Grand
+bank: 0 prog: 7 name: Dark Chateau Grand
+bank: 0 prog: 8 name: Rhodes EP
+bank: 0 prog: 9 name: DX7 EP
+bank: 0 prog: 10 name: Rhodes Bell EP
+bank: 0 prog: 11 name: Rotary Organ
+bank: 0 prog: 12 name: Small Pipe Organ
+bank: 0 prog: 13 name: Pipe Organ Full
+bank: 0 prog: 14 name: Small Plein-Jeu
+bank: 0 prog: 15 name: Flute Sml Plein-Jeu
+bank: 0 prog: 16 name: FlutePad Sml Plein-J
+bank: 0 prog: 17 name: Plein-jeu Organ Lge
+bank: 0 prog: 18 name: Pad Plein-Jeu Large
+bank: 0 prog: 19 name: Warm Pad
+bank: 0 prog: 20 name: Synth Strings
+bank: 0 prog: 21 name: Voyager-8
+bank: 0 prog: 22 name: Full Strings Vel
+bank: 0 prog: 23 name: Full Orchestra
+bank: 0 prog: 24 name: Chamber Strings 1
+bank: 0 prog: 25 name: Chamber Str 2 (SSO)
+bank: 0 prog: 26 name: Violin (all around)
+bank: 0 prog: 27 name: Two Violins
+bank: 0 prog: 28 name: Cello 1
+bank: 0 prog: 29 name: Cello 2 (SSO)
+bank: 0 prog: 30 name: Trumpet
+bank: 0 prog: 31 name: Trumpet+8 Vel
+bank: 0 prog: 32 name: Tuba
+bank: 0 prog: 33 name: Oboe
+bank: 0 prog: 34 name: Tenor Sax
+bank: 0 prog: 35 name: Alto Sax
+bank: 0 prog: 36 name: Flute Expr+8 (SSO)
+bank: 0 prog: 37 name: Flute 2
+bank: 0 prog: 38 name: Timpani
+bank: 0 prog: 39 name: Banjo 5 String
+bank: 0 prog: 40 name: Steel Guitar
+bank: 0 prog: 41 name: Nylon Guitar
+bank: 0 prog: 42 name: Spanish Guitar
+bank: 0 prog: 43 name: Spanish V Slide
+bank: 0 prog: 44 name: Clean Guitar
+bank: 0 prog: 45 name: LP Twin Elec Gtr
+bank: 0 prog: 46 name: LP Twin Dynamic
+bank: 0 prog: 47 name: Muted LP Twin
+bank: 0 prog: 48 name: Jazz Guitar
+bank: 0 prog: 49 name: Chorus Guitar
+bank: 0 prog: 50 name: YamC5 + Pad
+bank: 0 prog: 51 name: YamC5+LowStrings
+bank: 0 prog: 52 name: YamC5+ChamberStr
+bank: 0 prog: 53 name: YamC5+Strings
+bank: 0 prog: 54 name: Chateau Grand+Pad
+bank: 0 prog: 55 name: Ch Grand+LowStrings
+bank: 0 prog: 56 name: Ch Grand+ChamberStr
+bank: 0 prog: 57 name: Ch Grand+Strings
+bank: 0 prog: 58 name: DX7+Pad
+bank: 0 prog: 59 name: DX7+LowStrings
+done
+```
+Названия программ позволяют выбрать их для генерации звука. Если требуется изменить результат, то в проекте предусмотрен скрипт `midi2mp3.sh`, который можно вызвать в консоли с параметрами:
+
+```bash
+./midi2mp3.sh <Темп> <Максимальная длительность в секундах> <Исходный Midi> <Имя файла результата.mp3> <Конфигурационный файл>
+```
 
 
 ## 5.3. Пример 7. Использование микропроцессора Леонард Эйлер для генерации музыкальныых произведений

@@ -4155,7 +4155,7 @@ git clone --recursive https://latex.bmstu.ru/gitlab/hackathon2023/lab6.git
 cd lab6
 ```
 
-Далее в облаке [devlab.bmstu.ru](https://devlab.bmstu.ru) необходимо открыть файл [lab5.ipynb](https://latex.bmstu.ru/gitlab/hackathon2023/lab5/-/blob/main/lab5.ipynb?ref_type=heads)
+Далее в облаке [devlab.bmstu.ru](https://devlab.bmstu.ru) необходимо открыть файл [lab6.ipynb](https://latex.bmstu.ru/gitlab/hackathon2023/lab6/-/blob/main/lab6.ipynb?ref_type=heads)
 
 #### Сборка sw-kernel части проекта
 

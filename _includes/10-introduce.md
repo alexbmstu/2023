@@ -4441,8 +4441,8 @@ make clear
 Клонируйте репозиторий:
 
 ```bash
-git clone --recursive https://latex.bmstu.ru/gitlab/hackathon2023/lab7.git
-cd lab7
+git clone --recursive https://latex.bmstu.ru/gitlab/hackathon2023/lab8.git
+cd lab8
 ```
 
 Выполните команду:

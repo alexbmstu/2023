@@ -1,4 +1,4 @@
-**Организаторы практикума**
+**Организаторы**
 
 
 | <img src="assets/aleksei_popov.png" class="smallPic">                          | <img src="assets/stanislav_ibragimov.png" class="smallPic">                       | <img src="assets/egor_dubrovin.png" class="smallPic">                                                      | <img src="assets/Li.png" class="smallPic">                                                                   |

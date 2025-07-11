@@ -191,10 +191,10 @@
 **Ритм жизни**
 
 <audio controls>
-  <source src="data/21-Ритм жизни (Каменщики, фортепиано, хор, ударный инструмент).wav " type="audio/wav">
+  <source src="data/21-Ритм жизни (Каменщики, фортепиано, хор, ударный инструмент).wav" type="audio/wav">
 </audio>
 
-****
+**Рассвет**
 
 <audio controls>
   <source src="data/22-Рассвет (Хахатон, дарбука, меллотрон).wav " type="audio/wav">
@@ -236,7 +236,7 @@
   <source src="data/29-Нолан гений (Музычковы, синтезатор, космические голоса).wav " type="audio/wav">
 </audio>
 
-**На распутье **
+**На распутье**
 
 <audio controls>
   <source src="data/30-На распутье (Лавка душнил, гитара, хор, скрипка).wav" type="audio/wav">

@@ -31,7 +31,7 @@
 
 <a href="https://github.com/alexbmstu/2023/blob/master/docs/pr2023.pdf" target="_blank">Вступительная презентация</a>
 
-## *Резултаты практикума и победители*
+## *Результаты практикума и победители*
 
 ****
 
@@ -79,7 +79,7 @@
 **Классная мелодия**
 
 <audio controls>
-  <source src="data/3-Классная мелодия (Юниксоиды,  рояль, виолончель, скрипка).mp3 " type="audio/wav">
+  <source src="data/3-Классная мелодия (Юниксоиды,  рояль, виолончель, скрипка).mp3 " type="audio/mpeg">
 </audio>
 
 **Возвращение домой**
@@ -105,7 +105,7 @@
 **Из глубины веков (обработка)**
 
 <audio controls>
-  <source src="data/7-Из глубины веков (Йована Везирова, гитара, кларнет, ксилофон) обработка.mp3 " type="audio/wav">
+  <source src="data/7-Из глубины веков (Йована Везирова, гитара, кларнет, ксилофон) обработка.mp3 " type="audio/mpeg">
 </audio>
 
 
@@ -155,13 +155,13 @@
 **Жизненный цикл**
 
 <audio controls>
-  <source src="data/16-Жизненный цикл (The Vietles, фортепиано, скрипка, флейта).mp3 " type="audio/wav">
+  <source src="data/16-Жизненный цикл (The Vietles, фортепиано, скрипка, флейта).mp3 " type="audio/mpeg">
 </audio>
 
 **Pain**
 
 <audio controls>
-  <source src="data/17-Pain (Программисты музыки, гитара, электро-гитара, фортепиано, ударные).mp3 " type="audio/wav">
+  <source src="data/17-Pain (Программисты музыки, гитара, электро-гитара, фортепиано, ударные).mp3 " type="audio/mpeg">
 </audio>
 
 **Requiem la Sessione**
@@ -173,7 +173,7 @@
 **Requiem la Sessione (обработка)**
 
 <audio controls>
-  <source src="data/18-Requiem la Sessione (His Sleepy End, гитара, хор, скрипка) обработка.mp3 " type="audio/wav">
+  <source src="data/18-Requiem la Sessione (His Sleepy End, гитара, хор, скрипка) обработка.mp3 " type="audio/mpeg">
 </audio>
 
 **Взгляд в небеса**
@@ -209,7 +209,7 @@
 **Голоса**
 
 <audio controls>
-  <source src="data/25-Голоса (Ноунейм, хор, виолончель, гитара).mp3 " type="audio/wav">
+  <source src="data/25-Голоса (Ноунейм, хор, виолончель, гитара).mp3 " type="audio/mpeg">
 </audio>
 
 **На глубине**

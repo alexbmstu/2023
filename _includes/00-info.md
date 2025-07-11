@@ -31,4 +31,17 @@
 
 <a href="https://github.com/alexbmstu/2023/blob/master/docs/pr2023.pdf" target="_blank">Вступительная презентация</a>
 
+## *Резултаты практикума и победители*
+
+****
+
+### 1 Премия 
+
+**Missl Channel (Дремин и Ко, хор, флейта, гитара)**
+
+<audio controls>
+  <source src="data/12-Missl Channel (Дремин и Ко, хор, флейта, гитара).wav" type="audio/wav">
+</audio>
+
+
 

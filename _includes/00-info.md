@@ -44,4 +44,200 @@
 </audio>
 
 
+### 2 Премия 
 
+**Tarnished (Кавасаки, гитара, фортепиано, струнные, дилей, вокал)**
+
+<audio controls>
+  <source src="data/6-Tarnished (Кавасаки, гитара, фортепиано, струнные, дилей, вокал).wav" type="audio/wav">
+</audio>
+
+
+### 3 Премия 
+
+**Космос какой-то (Квадро, электро-гитара, синтезатор, звуки космоса)**
+
+<audio controls>
+  <source src="data/24-Космос какой-то (Квадро, электро-гитара, синтезатор, звуки космоса).wav" type="audio/wav">
+</audio>
+
+
+### Работы других участников
+
+**Квазиутопия**
+
+<audio controls>
+  <source src="data/1-Квазиутопия (Чипсеты, виолончель, ударные, хор).wav " type="audio/wav">
+</audio>
+
+**Гармония заката**
+
+<audio controls>
+  <source src="data/2-Гармония заката (Обогреватели Вышний Волочёк, хор, кларнет, скрипка, ударные).wav " type="audio/wav">
+</audio>
+
+**Классная мелодия**
+
+<audio controls>
+  <source src="data/3-Классная мелодия (Юниксоиды,  рояль, виолончель, скрипка).mp3 " type="audio/wav">
+</audio>
+
+**Возвращение домой**
+
+<audio controls>
+  <source src="data/4-Возвращение домой (Конечный автомат,  хор, виолончель, электро-гитара).wav " type="audio/wav">
+</audio>
+
+**Морской Дэнс**
+
+<audio controls>
+  <source src="data/5-Морской Дэнс (крутые_лемуры1337, банджо, кастаньеты, дульцимер, ксилофон, орган, колокольчики, лютня).wav " type="audio/wav">
+</audio>
+
+
+**Из глубины веков**
+
+<audio controls>
+  <source src="data/7-Из глубины веков (Йована Везирова, дудук, ксилофон, гитара).wav " type="audio/wav">
+</audio>
+
+
+**Из глубины веков (обработка)**
+
+<audio controls>
+  <source src="data/7-Из глубины веков (Йована Везирова, гитара, кларнет, ксилофон) обработка.mp3 " type="audio/wav">
+</audio>
+
+
+**Слияние двух стилей**
+
+<audio controls>
+  <source src="data/8-Слияние двух стилей (Аккордеонный врыв, аккордеон, альт саксофон, баритон саксофон, басовые струнные, банжо).wav " type="audio/wav">
+</audio>
+
+**Subwoofer Lullaby - С418**
+
+<audio controls>
+  <source src="data/9-Subwoofer Lullaby - С418 (Князев & Михайличенко, струнный ансамбль, хор, флейта).wav " type="audio/wav">
+</audio>
+
+**Проблеск света**
+
+<audio controls>
+  <source src="data/10-Проблеск света (Хахатон, дарбука, гитара, бас гитара).wav " type="audio/wav">
+</audio>
+
+**Сказ про Анализ Алгоритмов**
+
+<audio controls>
+  <source src="data/11-Сказ про Анализ Алгоритмов (Автоматчики, флейты, синтезатор).wav " type="audio/wav">
+</audio>
+
+
+**Лазурные Гармонии**
+
+<audio controls>
+  <source src="data/13-Лазурные Гармонии (Кукловоды, синтезатор, электро-скрипка, Voyager-8).wav " type="audio/wav">
+</audio>
+
+**Fake Rammstein**
+
+<audio controls>
+  <source src="data/14-Fake Rammstein(Игорь Лабекин, хор, гитара, виолончель).wav " type="audio/wav">
+</audio>
+
+**Волшебство**
+
+<audio controls>
+  <source src="data/15-Волшебство (Гармонический Альянс, джаз гитара, хор, электро-фортепиано).wav " type="audio/wav">
+</audio>
+
+**Жизненный цикл**
+
+<audio controls>
+  <source src="data/16-Жизненный цикл (The Vietles, фортепиано, скрипка, флейта).mp3 " type="audio/wav">
+</audio>
+
+**Pain**
+
+<audio controls>
+  <source src="data/17-Pain (Программисты музыки, гитара, электро-гитара, фортепиано, ударные).mp3 " type="audio/wav">
+</audio>
+
+**Requiem la Sessione**
+
+<audio controls>
+  <source src="data/18-Requiem la Sessione (His Sleepy End, гитара, хор, скрипка).wav " type="audio/wav">
+</audio>
+
+**Requiem la Sessione (обработка)**
+
+<audio controls>
+  <source src="data/18-Requiem la Sessione (His Sleepy End, гитара, хор, скрипка) обработка.mp3 " type="audio/wav">
+</audio>
+
+**Взгляд в небеса**
+
+<audio controls>
+  <source src="data/19-Взгляд в небеса (Алексей Николаев, флейта, клавесин, синтезатор).wav " type="audio/wav">
+</audio>
+
+**Эволюция**
+
+<audio controls>
+  <source src="data/20-Эволюция (Лавка душнил, флейта, синтезатор, электро-орган) .wav " type="audio/wav">
+</audio>
+
+**Ритм жизни**
+
+<audio controls>
+  <source src="data/21-Ритм жизни (Каменщики, фортепиано, хор, ударный инструмент).wav " type="audio/wav">
+</audio>
+
+****
+
+<audio controls>
+  <source src="data/22-Рассвет (Хахатон, дарбука, меллотрон).wav " type="audio/wav">
+</audio>
+
+**Ветер**
+
+<audio controls>
+  <source src="data/23-Ветер (Дима и 4 гнома, кларнет, флейта, вокал, скрипки).wav " type="audio/wav">
+</audio>
+
+**Голоса**
+
+<audio controls>
+  <source src="data/25-Голоса (Ноунейм, хор, виолончель, гитара).mp3 " type="audio/wav">
+</audio>
+
+**На глубине**
+
+<audio controls>
+  <source src="data/26-На глубине (Графовые композиторы, флейта , ксилофон, трамбон).wav " type="audio/wav">
+</audio>
+
+**Commendatori**
+
+<audio controls>
+  <source src="data/27-Commendatori (Градиент, орган).wav " type="audio/wav">
+</audio>
+
+**EverlastingReference**
+
+<audio controls>
+  <source src="data/28-EverlastingReference (Dota 2, фортепиано).wav " type="audio/wav">
+</audio>
+
+**Нолан гений**
+
+<audio controls>
+  <source src="data/29-Нолан гений (Музычковы, синтезатор, космические голоса).wav " type="audio/wav">
+</audio>
+
+**На распутье **
+
+<audio controls>
+  <source src="data/30-На распутье (Лавка душнил, гитара, хор, скрипка).wav" type="audio/wav">
+</audio>
